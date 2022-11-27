@@ -1,32 +1,104 @@
+import numpy as np		# arrays & matricies
+from tqdm import tqdm	# command line progress bar
+from PIL import Image	# loading images
+import os				# access to local files
+from enum import Enum	# create enums
+ 
 from neuralNetwork import NeuralNetwork
-import numpy as np
+
+class Mode(Enum):
+    TRAINING = 1
+    TESTING = 2
 
 class Main:
 
-	def setup(self):
-		print("start setup")
-		
-		self.network = NeuralNetwork(2,2,1)
+	# static data
+	emotionFolderNames = ["anger", "contempt", "disgust", "fear", "happiness", "neutrality", "sadness", "surprise"]
+	# correctOutput = np.array([
+	# 	[1,0,0,0,0,0,0,0], # anger
+	# 	[0,1,0,0,0,0,0,0], # contempt
+	# 	[0,0,1,0,0,0,0,0], # digust
+	# 	[0,0,0,1,0,0,0,0], # fear
+	# 	[0,0,0,0,1,0,0,0], # happiness
+	# 	[0,0,0,0,0,1,0,0], # neutrality
+	# 	[0,0,0,0,0,0,1,0], # sadness
+	# 	[0,0,0,0,0,0,0,1]  # surprise
+	# ])
 
-		# load images
+	def emotionFromOutputArray(self, output):
+		highestValueIndex = np.argmax(output)
+		return self.emotionFolderNames[highestValueIndex]
+
+	def fileNames(self, emotionFolderName, mode: Mode):
+		emotionFolderPath = os.getcwd() + '/dataset/' + emotionFolderName
+
+		fileNames = [] 
+		for name in os.listdir(emotionFolderPath):
+			fileNames.append(name)
+		
+		totalCount = len(fileNames)
+		trainingCount = round(totalCount * 3/4)
+
+		if mode is Mode.TRAINING:
+			return fileNames[:trainingCount]
+		else:
+			testingCount = totalCount - trainingCount
+			return fileNames[testingCount:]
+
+	def loadImage(self, emotionFolderName, fileName):
+			path = 'dataset/' + emotionFolderName + '/' + fileName
+			image = Image.open(path)
+			array = np.array(image).flatten()
+			return array
+
+
+	def setup(self):
+		print("🛠️  Setting Up")
+		
+		# create nn
+		sizeOfInputLayer = 224 * 224 # based on image size
+		sizeOfHiddenLayer = 8 # test with different values for this
+		sizeOfOutputLayer = len(self.emotionFolderNames)
+		self.network = NeuralNetwork(sizeOfInputLayer, sizeOfHiddenLayer, sizeOfOutputLayer)
 
 	def train(self):
-		print("start training")
+		print("\n🎛️  Training:")
+
+		for emotion in tqdm(self.emotionFolderNames):
+			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
+
+			for fileName in imageFileNames:
+				imageData = self.loadImage(emotion, fileName)
+				# train on this sample here!
 
 	def test(self):
-		print("start testing")
+		print("\n📊  Testing:")
 
-		# test images
-		input = np.array([	
-			[0],
-			[1]
-		])
-		output = self.network.feedfoward(input);
-		print(output)
+		numOfImagesTested = 0
+		numOfCorrectlyClassified = 0
+
+		for emotion in tqdm(self.emotionFolderNames):
+			imageFileNames = self.fileNames(emotion, Mode.TESTING)
+			numOfImagesTested += len(imageFileNames)
+
+			for fileName in imageFileNames:
+
+				imageData = self.loadImage(emotion, fileName)
+				output = self.network.feedfoward(imageData)
+				
+				predictedEmotion = self.emotionFromOutputArray(output)
+				if predictedEmotion is emotion:
+					numOfCorrectlyClassified += 1
+
+		percentage = (numOfCorrectlyClassified / numOfImagesTested) * 100
+		print(f"Testing Accuracy: {percentage}%")
 
 
 if __name__ == "__main__":
 	main = Main()
+
+	print("")
 	main.setup()
 	main.train()
 	main.test()
+	print("")
