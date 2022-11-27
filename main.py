@@ -28,7 +28,7 @@ class Main:
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
 		return self.emotionFolderNames[highestValueIndex]
-
+	
 	def fileNames(self, emotionFolderName, mode: Mode):
 		emotionFolderPath = os.getcwd() + '/dataset/' + emotionFolderName
 
@@ -64,7 +64,7 @@ class Main:
 	def train(self):
 		print("\n🎛️  Training:")
 
-		for emotion in tqdm(self.emotionFolderNames):
+		for emotion in tqdm(self.emotionFolderNames, leave=False):
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
 
 			for fileName in imageFileNames:
@@ -72,26 +72,50 @@ class Main:
 				# train on this sample here!
 
 	def test(self):
-		print("\n📊  Testing:")
+		print("\n📊 Testing:")
 
-		numOfImagesTested = 0
-		numOfCorrectlyClassified = 0
+		# Stat variables
+		numOfImagesTested_total = 0
+		numOfCorrectlyClassified_total = 0
+		specific_percentages = []
 
-		for emotion in tqdm(self.emotionFolderNames):
+		# Test each emotion
+		for emotion in tqdm(self.emotionFolderNames, leave=False):
+
+			# Stats for this specific emotion
+			numOfCorrectlyClassified_specific = 0
+
+			# Get image filenames for testing
 			imageFileNames = self.fileNames(emotion, Mode.TESTING)
-			numOfImagesTested += len(imageFileNames)
+			numOfImagesTested_specific = len(imageFileNames)
 
+			# Go through each file in this emotion
 			for fileName in imageFileNames:
 
+				# Load image & process it with the neural network
 				imageData = self.loadImage(emotion, fileName)
 				output = self.network.feedfoward(imageData)
 				
+				# Compare to the correct output
 				predictedEmotion = self.emotionFromOutputArray(output)
 				if predictedEmotion is emotion:
-					numOfCorrectlyClassified += 1
+					numOfCorrectlyClassified_specific += 1
 
-		percentage = (numOfCorrectlyClassified / numOfImagesTested) * 100
-		print(f"Testing Accuracy: {percentage}%")
+			# Update total stats from specifc stats
+			numOfImagesTested_total += numOfImagesTested_specific
+			numOfCorrectlyClassified_total += numOfCorrectlyClassified_specific
+
+			# Save specific stats
+			percentage = (numOfCorrectlyClassified_specific / numOfImagesTested_specific) * 100
+			specific_percentages.append(percentage)
+
+		# Print stats
+		percentage = (numOfCorrectlyClassified_total / numOfImagesTested_total) * 100
+		print(f"Accuracy: {percentage}%")
+
+		for index, emotion in enumerate(self.emotionFolderNames):
+			print(f"- {emotion.capitalize()}: {specific_percentages[index]}%")
+		
 
 
 if __name__ == "__main__":
