@@ -13,8 +13,8 @@ class NeuralNetwork:
 		self.weights_hidden_output = np.random.rand(numOutputNodes, numHiddenNodes)
 
 		# bias value for each node (hidden & output)
-		self.bias_hidden = np.ones((numHiddenNodes, 1))
-		self.bias_output = np.ones((numOutputNodes, 1))
+		self.bias_hidden = np.ones((numHiddenNodes))
+		self.bias_output = np.ones((numOutputNodes))
 
 	def sigmoid(self, x):
 		return 1/(1+np.exp(-x))
@@ -35,6 +35,6 @@ class NeuralNetwork:
 		# add output layer bias
 		output_withBias = np.add(output, self.bias_output)
 		# activate using sigmoid
-		output_activated = self.sigmoid(output)
+		output_activated = self.sigmoid(output_withBias)
 
 		return output_activated
