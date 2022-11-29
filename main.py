@@ -1,8 +1,9 @@
 import numpy as np		# arrays & matricies
 from tqdm import tqdm	# command line progress bar
-from PIL import Image	# loading images
-import os				# access to local files
+from PIL import Image, ImageOps	# loading images
+import os				# access to local filess
 from enum import Enum	# create enums
+import string
 import matplotlib.pyplot as plt
  
 from neuralNetwork import NeuralNetwork
@@ -48,8 +49,11 @@ class Main:
 
 	def loadImage(self, emotionFolderName, fileName):
 			path = 'dataset/' + emotionFolderName + '/' + fileName
+			
 			image = Image.open(path)
+			image = ImageOps.grayscale(image)
 			array = np.array(image).flatten()
+			array = np.reshape(array, (len(array), 1))
 			normalized = (array / 255) * 2 - 1
 			return normalized
 
@@ -59,7 +63,7 @@ class Main:
 		
 		# create nn
 		sizeOfInputLayer = 224 * 224 # based on image size
-		sizeOfHiddenLayer = 20 # test with different values for this
+		sizeOfHiddenLayer = 60 # test with different values for this
 		sizeOfOutputLayer = len(self.emotionFolderNames)
 		self.network = NeuralNetwork(sizeOfInputLayer, sizeOfHiddenLayer, sizeOfOutputLayer)
 
@@ -74,10 +78,13 @@ class Main:
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
 			
 			expectedOutput = self.correctOutput[emotionIndex]
+			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 
 			for fileName in imageFileNames:
+				if fileName.endswith('.png') is False:
+					continue
 				imageInput = self.loadImage(emotion, fileName)
-				error = self.network.train(1, imageInput, expectedOutput)
+				error = self.network.train(0.1, imageInput, expectedOutput)
 
 				# y.append(error)
 				# x.append(i)
@@ -110,6 +117,8 @@ class Main:
 			for fileName in imageFileNames:
 
 				# Load image & process it with the neural network
+				if fileName.endswith('.png') is False:
+					continue
 				imageData = self.loadImage(emotion, fileName)
 				output = self.network.feedfoward(imageData)
 				

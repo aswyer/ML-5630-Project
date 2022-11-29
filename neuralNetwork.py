@@ -14,11 +14,11 @@ class NeuralNetwork:
 		self.weights_hidden_output = np.random.rand(numOutputNodes, numHiddenNodes)
 
 		# bias value for each node (hidden & output)
-		self.bias_hidden = np.ones((numHiddenNodes))
-		self.bias_output = np.ones((numOutputNodes))
+		self.bias_hidden = np.ones((numHiddenNodes, 1))
+		self.bias_output = np.ones((numOutputNodes, 1))
 
 	def sigmoid(self, x):
-		return 1/(1+np.exp(-x))
+		return 1/(1+np.exp(-1 * x))
 
 	def feedfoward(self, input):
 
@@ -65,32 +65,38 @@ class NeuralNetwork:
 
 		# Update Weights
 
-		# Hidden -> Output
-		# Error of the output
-		output_error = correctOutput - output_activated
-		# Weights
-		output_activated_derivative = output_activated * (1 - output_activated)					# derivative of current output
-		output_gradient = np.matmul(output_error, output_activated_derivative)					# hidden->output error * output layer derivatives
-		hidden_activated_transpose = np.transpose(hidden_activated)								# hidden layer output transposed
-		hidden_output_delta = lr * output_gradient * hidden_activated_transpose					# calc delta
-		self.weights_hidden_output = np.add(self.weights_hidden_output, hidden_output_delta)	# update weights
-		# Bias
-		output_bias_delta = lr * output_gradient
+		# output error
+		output_errors = correctOutput - output_activated
+		# output gradient
+		output_gradients = output_activated * (1 - output_activated) 	# sigmoid * (1 - sigmoid)
+		output_gradients = np.multiply(output_gradients, output_errors) # * E
+		output_gradients = output_gradients * lr						# * lr
+		# hidden -> output deltas
+		hidden_transposed = np.transpose(hidden)
+		weights_hidden_output_deltas = np.multiply(output_gradients, hidden_transposed)
+		# update weights	
+		self.weights_hidden_output = self.weights_hidden_output + weights_hidden_output_deltas
+		# update bias
+		output_bias_delta = lr * output_gradients
 		self.bias_output = np.add(self.bias_output, output_bias_delta)
 
 
-		# Input -> Hidden
-		# Error of hidden -> output weights
+		# hidden error
 		weights_hidden_output_transposed = np.transpose(self.weights_hidden_output) 
-		hidden_error = np.matmul(weights_hidden_output_transposed, output_error)
-		# Weights
-		hidden_activated_derivative = hidden_activated * (1 - hidden_activated)				# derivative of current hidden output
-		hidden_gradient = np.matmul(hidden_error, hidden_activated_derivative)				# input->hidden error * hidden layer derivatives
-		inputs_transpose = np.transpose(input)												# input layer output transposed
-		input_hidden_delta = lr * hidden_gradient * inputs_transpose						# calc delta
-		self.weights_input_hidden = np.add(self.weights_input_hidden, input_hidden_delta)	# update weights
-		# Bias
-		hidden_bias_delta = lr * hidden_gradient
+		hidden_errors = np.matmul(weights_hidden_output_transposed, output_errors) # feed backwards to get error at the hidden layer
+		# hidden gradient
+		hidden_gradients = hidden * (1 - hidden)
+		hidden_gradients = np.multiply(hidden_gradients, hidden_errors)
+		hidden_gradients = hidden_gradients * lr
+		# input -> hidden deltas
+		inputs_transposed = np.transpose(input)
+		weights_input_hidden_deltas = np.multiply(hidden_gradients, inputs_transposed)
+		# update weights
+		self.weights_input_hidden = self.weights_input_hidden + weights_input_hidden_deltas
+		if math.isnan(self.weights_input_hidden[0][0]):
+			print("NAN")
+		# update bias
+		hidden_bias_delta = lr * hidden_gradients
 		self.bias_hidden = np.add(self.bias_hidden, hidden_bias_delta)
 
 		return 
