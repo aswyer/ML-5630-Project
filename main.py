@@ -3,6 +3,7 @@ from tqdm import tqdm	# command line progress bar
 from PIL import Image	# loading images
 import os				# access to local files
 from enum import Enum	# create enums
+import matplotlib.pyplot as plt
  
 from neuralNetwork import NeuralNetwork
 
@@ -14,16 +15,16 @@ class Main:
 
 	# static data
 	emotionFolderNames = ["anger", "contempt", "disgust", "fear", "happiness", "neutrality", "sadness", "surprise"]
-	# correctOutput = np.array([
-	# 	[1,0,0,0,0,0,0,0], # anger
-	# 	[0,1,0,0,0,0,0,0], # contempt
-	# 	[0,0,1,0,0,0,0,0], # digust
-	# 	[0,0,0,1,0,0,0,0], # fear
-	# 	[0,0,0,0,1,0,0,0], # happiness
-	# 	[0,0,0,0,0,1,0,0], # neutrality
-	# 	[0,0,0,0,0,0,1,0], # sadness
-	# 	[0,0,0,0,0,0,0,1]  # surprise
-	# ])
+	correctOutput = np.array([
+		[1,0,0,0,0,0,0,0], # anger
+		[0,1,0,0,0,0,0,0], # contempt
+		[0,0,1,0,0,0,0,0], # digust
+		[0,0,0,1,0,0,0,0], # fear
+		[0,0,0,0,1,0,0,0], # happiness
+		[0,0,0,0,0,1,0,0], # neutrality
+		[0,0,0,0,0,0,1,0], # sadness
+		[0,0,0,0,0,0,0,1]  # surprise
+	])
 
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
@@ -49,7 +50,8 @@ class Main:
 			path = 'dataset/' + emotionFolderName + '/' + fileName
 			image = Image.open(path)
 			array = np.array(image).flatten()
-			return array
+			normalized = (array / 255) * 2 - 1
+			return normalized
 
 
 	def setup(self):
@@ -57,19 +59,34 @@ class Main:
 		
 		# create nn
 		sizeOfInputLayer = 224 * 224 # based on image size
-		sizeOfHiddenLayer = 8 # test with different values for this
+		sizeOfHiddenLayer = 20 # test with different values for this
 		sizeOfOutputLayer = len(self.emotionFolderNames)
 		self.network = NeuralNetwork(sizeOfInputLayer, sizeOfHiddenLayer, sizeOfOutputLayer)
 
 	def train(self):
 		print("\n🎛️  Training:")
 
-		for emotion in tqdm(self.emotionFolderNames, leave=False):
+		# i = 0
+		# x = []
+		# y = []
+
+		for (emotionIndex, emotion) in enumerate(tqdm(self.emotionFolderNames, leave=False)):
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
+			
+			expectedOutput = self.correctOutput[emotionIndex]
 
 			for fileName in imageFileNames:
-				imageData = self.loadImage(emotion, fileName)
-				# train on this sample here!
+				imageInput = self.loadImage(emotion, fileName)
+				error = self.network.train(1, imageInput, expectedOutput)
+
+				# y.append(error)
+				# x.append(i)
+				# i += 1
+				
+		# plt.plot(x,y)
+				
+				
+				
 
 	def test(self):
 		print("\n📊 Testing:")
@@ -98,7 +115,7 @@ class Main:
 				
 				# Compare to the correct output
 				predictedEmotion = self.emotionFromOutputArray(output)
-				if predictedEmotion is emotion:
+				if predictedEmotion == emotion:
 					numOfCorrectlyClassified_specific += 1
 
 			# Update total stats from specifc stats
@@ -126,3 +143,4 @@ if __name__ == "__main__":
 	main.train()
 	main.test()
 	print("")
+	# plt.show()

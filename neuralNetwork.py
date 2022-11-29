@@ -25,7 +25,7 @@ class NeuralNetwork:
 		# Outputs of "Hidden" Layer
 		# dot inputs & input->hidden weights
 		hidden = np.matmul(self.weights_input_hidden, input)
-		# add hidden layer bias
+		# add hidden layer bias	
 		hidden_withBias = np.add(hidden, self.bias_hidden)
 		# activate using sigmoid
 		hidden_activated = self.sigmoid(hidden_withBias)
@@ -40,62 +40,63 @@ class NeuralNetwork:
 
 		return output_activated
 
-class Neuron:
-	def __init__(self, bias):
-		self.bias = bias
-		self.weights = []
+	# Backpropigation
+	def train(self, lr, input, correctOutput):
 
-	def calculate_output(self, inputs):
-		self.inputs = inputs
-		self.output = self.sigmoid(self.calc_net_input)
-		return self.outputs
+		# Get current output
 
-	def calc_net_input(self):
-		net_input = 0
-		for i in range(len(self.inputs)):
-			net_input += self.inputs[i] * self.weights[i]
-		return net_input + self.bias
+		# ---------------- Same code as seen in feedfoward() ------------------
+		# Outputs of "Hidden" Layer
+		# dot inputs & input->hidden weights
+		hidden = np.matmul(self.weights_input_hidden, input)
+		# add hidden layer bias	
+		hidden_withBias = np.add(hidden, self.bias_hidden)
+		# activate using sigmoid
+		hidden_activated = self.sigmoid(hidden_withBias)
 
-	# where x is the total net input
-	def sigmoid(self, x):
-		return 1/(1+np.exp(-x))
+		# Outputs of "Output" Layer
+		# dot hidden outputs & hidden->output weights
+		output = np.matmul(self.weights_hidden_output, hidden_activated)
+		# add output layer bias
+		output_withBias = np.add(output, self.bias_output)
+		# activate using sigmoid
+		output_activated = self.sigmoid(output_withBias)
+		# ---------------------------------------------------------------------
 
-	# function calculates mse for the individual node	
-	def calc_mse(self, target_output):
-		return 0.5 * (target_output - self.output) ** 2
+		# Update Weights
 
-	def calc_pd_err_wrt_output(self, target_ouput):
-		return -(target_ouput - self.output)
+		# Hidden -> Output
+		# Error of the output
+		output_error = correctOutput - output_activated
+		# Weights
+		output_activated_derivative = output_activated * (1 - output_activated)					# derivative of current output
+		output_gradient = np.matmul(output_error, output_activated_derivative)					# hidden->output error * output layer derivatives
+		hidden_activated_transpose = np.transpose(hidden_activated)								# hidden layer output transposed
+		hidden_output_delta = lr * output_gradient * hidden_activated_transpose					# calc delta
+		self.weights_hidden_output = np.add(self.weights_hidden_output, hidden_output_delta)	# update weights
+		# Bias
+		output_bias_delta = lr * output_gradient
+		self.bias_output = np.add(self.bias_output, output_bias_delta)
 
-	# calculate partial derivative of total net input with respect to input
-	# total net input is the weighted sum of all inputs onto the neuron 
-	def calc_pd_tni_wrt_input(self):
-		return self.output * (1 - self.output)
 
-	# this function tells how much to change the neurons input to move closer to the expected output
-	# calculate partial derivative of error with respect to total net input
-	def calc_pd_of_err_wrt_tni(self, target_output):
-		return self.calc_pd_err_wrt_output(target_output) * self.calc_pd_tni_wrt_input()
+		# Input -> Hidden
+		# Error of hidden -> output weights
+		weights_hidden_output_transposed = np.transpose(self.weights_hidden_output) 
+		hidden_error = np.matmul(weights_hidden_output_transposed, output_error)
+		# Weights
+		hidden_activated_derivative = hidden_activated * (1 - hidden_activated)				# derivative of current hidden output
+		hidden_gradient = np.matmul(hidden_error, hidden_activated_derivative)				# input->hidden error * hidden layer derivatives
+		inputs_transpose = np.transpose(input)												# input layer output transposed
+		input_hidden_delta = lr * hidden_gradient * inputs_transpose						# calc delta
+		self.weights_input_hidden = np.add(self.weights_input_hidden, input_hidden_delta)	# update weights
+		# Bias
+		hidden_bias_delta = lr * hidden_gradient
+		self.bias_hidden = np.add(self.bias_hidden, hidden_bias_delta)
 
-	#gives the partial derivative of total net input with resepct to the weights
-	def calc_pd_tni_wrt_weight(self, index):
-		return self.inputs[index]
+		return 
+		# np.std(self.weights_hidden_output)
+		# self.bias_output
+		# self.bias_hidden
+		# np.sum(np.power(output_error, 2))
 
-class NeuronLayer:
-	def __init__(self, number_neurons, bias):
 		
-		# sets bias to be the same for all neurons in a layer and randomly initializes it if
-		# it has not been initialized yet.
-		self.bias = bias if bias else random.random()
-		self.neurons = []
-		for i in range (number_neurons):
-			self.neurons.append(Neuron(self.bias))
-
-		#feeds inputs into the layer and returns outputs
-		def feed_forward(self, inputs):
-			outputs = []
-			for neuron in self.neurons:
-				outputs.append(neuron.calculate_output(inputs))
-			return outputs
-
-		# TODO: add method to print info of neuron layer
