@@ -14,9 +14,9 @@ class Mode(Enum):
     TESTING = 2
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = 0.01
-SIZE_HIDDEN_LAYER = 40
-EPOCHS = 3
+LEARNING_RATE = 0.1
+SIZE_HIDDEN_LAYER = 26
+EPOCHS = 1
 
 class Main:
 
@@ -165,5 +165,10 @@ if __name__ == "__main__":
 	for epoch in range(EPOCHS):
 		main.train(epoch)
 	main.test()
+	
+	# if want to test specific image set breakpoint below & run the below code in the debug console:
+	# imageData = self.loadImage("happiness", "happiness_2.png")
+	# print(self.network.feedfoward(imageData))
+
 	print("")
 	# plt.show()
