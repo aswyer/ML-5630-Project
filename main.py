@@ -166,9 +166,9 @@ if __name__ == "__main__":
 		main.train(epoch)
 	main.test()
 	
-	# if want to test specific image set breakpoint below & run the below code in the debug console:
-	# imageData = self.loadImage("happiness", "happiness_2.png")
-	# print(self.network.feedfoward(imageData))
+	# if want to test specific image set breakpoint on print("") & run the below code in the debug console:
+	# imageData = main.loadImage("happiness", "happiness_2.png")
+	# print(main.network.feedfoward(imageData))
 
 	print("")
 	# plt.show()
