@@ -14,8 +14,8 @@ class Mode(Enum):
     TESTING = 2
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = 0.5
-SIZE_HIDDEN_LAYER = 40
+LEARNING_RATE = 0.1
+SIZE_HIDDEN_LAYER = 20
 EPOCHS = 1
 
 class Main:
@@ -106,7 +106,7 @@ class Main:
 		random.shuffle(imageAssets)
 
 		# Setup debug plot
-		y = np.empty((0,10), int)
+		y = np.empty((0,20), int)
 
 		# Train for each image
 		for imageAsset in tqdm(imageAssets, leave=False):
@@ -121,7 +121,6 @@ class Main:
 			y = np.append(y, [debugValue], axis=0)
 
 		# Configure & show debug plot
-		y = y[::20]
 		x = np.arange(0, len(y), 1)
 		plot = plt.plot(x,y)
 		plt.show()

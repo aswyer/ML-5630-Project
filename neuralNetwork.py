@@ -102,7 +102,7 @@ class NeuralNetwork:
 
 		# return debug value to plot
 		flattened = self.weights_input_hidden.flat
-		return flattened[::int(np.ceil(len(flattened)/10))]
+		return flattened[::int(np.ceil(len(flattened)/20))]
 		# np.random.choice(self.weights_input_hidden.flat, size=3, replace=False)
 		# self.weights_input_hidden.flatten()
 		# self.weights_hidden_output[7]
