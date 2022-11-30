@@ -100,7 +100,8 @@ class NeuralNetwork:
 		# update bias
 		self.bias_hidden = np.add(self.bias_hidden, hidden_gradients)
 
-		return self.weights_hidden_output[7]
+		return
+		# self.weights_hidden_output[7]
 		# np.std(self.weights_hidden_output)
 		# self.bias_output
 		# self.bias_hidden
