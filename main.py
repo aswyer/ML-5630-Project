@@ -4,6 +4,7 @@ from PIL import Image, ImageOps	# loading images
 import os				# access to local filess
 from enum import Enum	# create enums
 import string
+import random
 import matplotlib.pyplot as plt
  
 from neuralNetwork import NeuralNetwork
@@ -23,20 +24,20 @@ class Main:
 		"contempt", 
 		"disgust", 
 		"fear", 
-		"surprise",
 		"happiness", 
 		"neutrality", 
 		"sadness",
+		"surprise"
 	]
 	correctOutput = np.array([
 		[1,0,0,0,0,0,0,0], # anger
 		[0,1,0,0,0,0,0,0], # contempt
 		[0,0,1,0,0,0,0,0], # digust
 		[0,0,0,1,0,0,0,0], # fear
-		[0,0,0,0,0,0,0,1],  # surprise
 		[0,0,0,0,1,0,0,0], # happiness
 		[0,0,0,0,0,1,0,0], # neutrality
-		[0,0,0,0,0,0,1,0] # sadness
+		[0,0,0,0,0,0,1,0], # sadness
+		[0,0,0,0,0,0,0,1]  # surprise
 	])
 
 	def emotionFromOutputArray(self, output):
@@ -82,28 +83,50 @@ class Main:
 	def train(self):
 		print("\n🎛️  Training:")
 
-		i = 0
-		x = []
-		y = []
+		# Get all images
+		imageAssets = []
 
-		for (emotionIndex, emotion) in enumerate(tqdm(self.emotionFolderNames, leave=False)):
+		for (emotionIndex, emotion) in enumerate(self.emotionFolderNames):
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
+
+			for fileName in imageFileNames:
+				if fileName.endswith('.png') is False: continue
+				imageAssets.append((emotion, emotionIndex, fileName))
+
+		# Shuffle images
+		random.shuffle(imageAssets)
+
+		# Train for each image
+		for imageAsset in tqdm(imageAssets, leave=False):
+			(emotion, emotionIndex, fileName) = imageAsset
 			
 			expectedOutput = self.correctOutput[emotionIndex]
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
+			
+			imageInput = self.loadImage(emotion, fileName)
+			error = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
 
-			for fileName in imageFileNames:
-				print(fileName)
-				if fileName.endswith('.png') is False:
-					continue
-				imageInput = self.loadImage(emotion, fileName)
-				error = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
+			
 
-				y.append(error)
-				x.append(i)
-				i += 1
+
+		# for (emotionIndex, emotion) in enumerate(tqdm(self.emotionFolderNames, leave=False)):
+		# 	imageFileNames = self.fileNames(emotion, Mode.TRAINING)
+			
+		# 	expectedOutput = self.correctOutput[emotionIndex]
+		# 	expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
+
+		# 	for fileName in imageFileNames:
+		# 		print(fileName)
+		# 		if fileName.endswith('.png') is False:
+		# 			continue
+		# 		imageInput = self.loadImage(emotion, fileName)
+		# 		error = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
+
+		# 		y.append(error)
+		# 		x.append(i)
+		# 		i += 1
 				
-		plt.plot(x,y)
+		# plt.plot(x,y)
 				
 				
 				
@@ -133,7 +156,6 @@ class Main:
 				if fileName.endswith('.png') is False:
 					continue
 				imageData = self.loadImage(emotion, fileName)
-				print(fileName)
 				output = self.network.feedfoward(imageData)
 				
 				# Compare to the correct output
