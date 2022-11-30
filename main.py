@@ -14,7 +14,8 @@ class Mode(Enum):
     TESTING = 2
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = 0.1
+LEARNING_RATE = 0.01
+SIZE_HIDDEN_LAYER = 25
 
 class Main:
 
@@ -52,7 +53,7 @@ class Main:
 			fileNames.append(name)
 		
 		totalCount = len(fileNames)
-		trainingCount = round(totalCount * 3/4)
+		trainingCount = round(totalCount * 0.9)
 
 		if mode is Mode.TRAINING:
 			return fileNames[:trainingCount]
@@ -76,9 +77,8 @@ class Main:
 		
 		# create nn
 		sizeOfInputLayer = 224 * 224 # based on image size
-		sizeOfHiddenLayer = 10 # test with different values for this
 		sizeOfOutputLayer = len(self.emotionFolderNames)
-		self.network = NeuralNetwork(sizeOfInputLayer, sizeOfHiddenLayer, sizeOfOutputLayer)
+		self.network = NeuralNetwork(sizeOfInputLayer, SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 	def train(self):
 		print("\n🎛️  Training:")
