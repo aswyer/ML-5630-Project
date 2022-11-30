@@ -14,8 +14,8 @@ class Mode(Enum):
     TESTING = 2
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = 0.1
-SIZE_HIDDEN_LAYER = 26
+LEARNING_RATE = 0.001
+SIZE_HIDDEN_LAYER = 60
 EPOCHS = 1
 
 class Main:
@@ -30,6 +30,8 @@ class Main:
 		"neutrality", 
 		"sadness",
 		"surprise"
+		# "negative", 
+		# "positive"
 	]
 	correctOutput = np.array([
 		[1,0,0,0,0,0,0,0], # anger
@@ -40,11 +42,17 @@ class Main:
 		[0,0,0,0,0,1,0,0], # neutrality
 		[0,0,0,0,0,0,1,0], # sadness
 		[0,0,0,0,0,0,0,1]  # surprise
+		# [1, 0], # negative
+		# [0, 1],  # positive
 	])
 
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
 		return self.emotionFolderNames[highestValueIndex]
+		# if output[1] > output[0]:
+		# 	return self.emotionFolderNames[1]
+		# else:
+		# 	return self.emotionFolderNames[0]
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
 		emotionFolderPath = os.getcwd() + '/' + DATASET_FOLDER_NAME + '/' + emotionFolderName
@@ -78,7 +86,7 @@ class Main:
 		
 		# create nn
 		sizeOfInputLayer = 224 * 224 # based on image size
-		sizeOfOutputLayer = len(self.emotionFolderNames)
+		sizeOfOutputLayer = len(self.correctOutput[0])
 		self.network = NeuralNetwork(sizeOfInputLayer, SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 	def train(self, epoch):
@@ -97,6 +105,9 @@ class Main:
 		# Shuffle images
 		random.shuffle(imageAssets)
 
+		# Setup debug plot
+		y = np.empty((0,3), int)
+
 		# Train for each image
 		for imageAsset in tqdm(imageAssets, leave=False):
 			(emotion, emotionIndex, fileName) = imageAsset
@@ -105,7 +116,14 @@ class Main:
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 			
 			imageInput = self.loadImage(emotion, fileName)
-			error = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
+			debugValue = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
+
+			y = np.append(y, [debugValue], axis=0)
+
+		y = y[::20]
+		x = np.arange(0, len(y), 1)
+		plot = plt.plot(x,y)
+		plt.show()
 				
 
 	def test(self):
@@ -167,8 +185,8 @@ if __name__ == "__main__":
 	main.test()
 	
 	# if want to test specific image set breakpoint on print("") & run the below code in the debug console:
-	# imageData = main.loadImage("happiness", "happiness_2.png")
+	# imageData = main.loadImage("positive", "positive_2.png")
 	# print(main.network.feedfoward(imageData))
 
 	print("")
-	# plt.show()
+	plt.show()
