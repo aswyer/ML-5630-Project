@@ -14,8 +14,8 @@ class Mode(Enum):
     TESTING = 2
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = 0.001
-SIZE_HIDDEN_LAYER = 60
+LEARNING_RATE = 0.5
+SIZE_HIDDEN_LAYER = 40
 EPOCHS = 1
 
 class Main:
@@ -59,6 +59,7 @@ class Main:
 
 		fileNames = [] 
 		for name in os.listdir(emotionFolderPath):
+			if name.endswith('.png') is False: continue
 			fileNames.append(name)
 		
 		totalCount = len(fileNames)
@@ -99,14 +100,13 @@ class Main:
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
 
 			for fileName in imageFileNames:
-				if fileName.endswith('.png') is False: continue
 				imageAssets.append((emotion, emotionIndex, fileName))
 
 		# Shuffle images
 		random.shuffle(imageAssets)
 
 		# Setup debug plot
-		y = np.empty((0,3), int)
+		y = np.empty((0,10), int)
 
 		# Train for each image
 		for imageAsset in tqdm(imageAssets, leave=False):
@@ -120,6 +120,7 @@ class Main:
 
 			y = np.append(y, [debugValue], axis=0)
 
+		# Configure & show debug plot
 		y = y[::20]
 		x = np.arange(0, len(y), 1)
 		plot = plt.plot(x,y)
@@ -148,8 +149,6 @@ class Main:
 			for fileName in imageFileNames:
 
 				# Load image & process it with the neural network
-				if fileName.endswith('.png') is False:
-					continue
 				imageData = self.loadImage(emotion, fileName)
 				output = self.network.feedfoward(imageData)
 				
