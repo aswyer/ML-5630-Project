@@ -12,19 +12,31 @@ class Mode(Enum):
     TRAINING = 1
     TESTING = 2
 
+DATASET_FOLDER_NAME = "dataset" #dataset_alt
+LEARNING_RATE = 0.1
+
 class Main:
 
 	# static data
-	emotionFolderNames = ["anger", "contempt", "disgust", "fear", "happiness", "neutrality", "sadness", "surprise"]
+	emotionFolderNames = [
+		"anger", 
+		"contempt", 
+		"disgust", 
+		"fear", 
+		"surprise",
+		"happiness", 
+		"neutrality", 
+		"sadness",
+	]
 	correctOutput = np.array([
 		[1,0,0,0,0,0,0,0], # anger
 		[0,1,0,0,0,0,0,0], # contempt
 		[0,0,1,0,0,0,0,0], # digust
 		[0,0,0,1,0,0,0,0], # fear
+		[0,0,0,0,0,0,0,1],  # surprise
 		[0,0,0,0,1,0,0,0], # happiness
 		[0,0,0,0,0,1,0,0], # neutrality
-		[0,0,0,0,0,0,1,0], # sadness
-		[0,0,0,0,0,0,0,1]  # surprise
+		[0,0,0,0,0,0,1,0] # sadness
 	])
 
 	def emotionFromOutputArray(self, output):
@@ -32,7 +44,7 @@ class Main:
 		return self.emotionFolderNames[highestValueIndex]
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
-		emotionFolderPath = os.getcwd() + '/dataset/' + emotionFolderName
+		emotionFolderPath = os.getcwd() + '/' + DATASET_FOLDER_NAME + '/' + emotionFolderName
 
 		fileNames = [] 
 		for name in os.listdir(emotionFolderPath):
@@ -48,7 +60,7 @@ class Main:
 			return fileNames[testingCount:]
 
 	def loadImage(self, emotionFolderName, fileName):
-			path = 'dataset/' + emotionFolderName + '/' + fileName
+			path = DATASET_FOLDER_NAME + '/' + emotionFolderName + '/' + fileName
 			
 			image = Image.open(path)
 			image = ImageOps.grayscale(image)
@@ -63,16 +75,16 @@ class Main:
 		
 		# create nn
 		sizeOfInputLayer = 224 * 224 # based on image size
-		sizeOfHiddenLayer = 60 # test with different values for this
+		sizeOfHiddenLayer = 10 # test with different values for this
 		sizeOfOutputLayer = len(self.emotionFolderNames)
 		self.network = NeuralNetwork(sizeOfInputLayer, sizeOfHiddenLayer, sizeOfOutputLayer)
 
 	def train(self):
 		print("\n🎛️  Training:")
 
-		# i = 0
-		# x = []
-		# y = []
+		i = 0
+		x = []
+		y = []
 
 		for (emotionIndex, emotion) in enumerate(tqdm(self.emotionFolderNames, leave=False)):
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
@@ -81,16 +93,17 @@ class Main:
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 
 			for fileName in imageFileNames:
+				print(fileName)
 				if fileName.endswith('.png') is False:
 					continue
 				imageInput = self.loadImage(emotion, fileName)
-				error = self.network.train(0.1, imageInput, expectedOutput)
+				error = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
 
-				# y.append(error)
-				# x.append(i)
-				# i += 1
+				y.append(error)
+				x.append(i)
+				i += 1
 				
-		# plt.plot(x,y)
+		plt.plot(x,y)
 				
 				
 				
@@ -120,6 +133,7 @@ class Main:
 				if fileName.endswith('.png') is False:
 					continue
 				imageData = self.loadImage(emotion, fileName)
+				print(fileName)
 				output = self.network.feedfoward(imageData)
 				
 				# Compare to the correct output
