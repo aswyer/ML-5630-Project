@@ -15,7 +15,8 @@ class Mode(Enum):
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
 LEARNING_RATE = 0.01
-SIZE_HIDDEN_LAYER = 25
+SIZE_HIDDEN_LAYER = 40
+EPOCHS = 3
 
 class Main:
 
@@ -80,8 +81,8 @@ class Main:
 		sizeOfOutputLayer = len(self.emotionFolderNames)
 		self.network = NeuralNetwork(sizeOfInputLayer, SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
-	def train(self):
-		print("\n🎛️  Training:")
+	def train(self, epoch):
+		print(f"\n🎛️  Training #{epoch + 1}")
 
 		# Get all images
 		imageAssets = []
@@ -108,7 +109,7 @@ class Main:
 				
 
 	def test(self):
-		print("\n📊 Testing:")
+		print("\n📊 Testing")
 
 		# Stat variables
 		numOfImagesTested_total = 0
@@ -161,7 +162,8 @@ if __name__ == "__main__":
 
 	print("")
 	main.setup()
-	main.train()
+	for epoch in range(EPOCHS):
+		main.train(epoch)
 	main.test()
 	print("")
 	# plt.show()
