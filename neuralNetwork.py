@@ -1,6 +1,5 @@
 import numpy as np
-import math
-import random
+import constants as const
 
 class NeuralNetwork:
 
@@ -103,16 +102,11 @@ class NeuralNetwork:
 		# update bias
 		self.bias_hidden = np.add(self.bias_hidden, hidden_gradients)
 
-
-		# !!! hidden_gradients is so small it results in weights_input_hidden changing very little
-
-
-
 		# return debug values to plot
 		ih_flattened = self.weights_input_hidden.flat
-		ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/20))]
+		ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/const.NUM_WEIGHT_SAMPLES))]
 		ho_flattened = self.weights_hidden_output.flat
-		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/20))]
+		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/const.NUM_WEIGHT_SAMPLES))]
 		return (ih_samples, ho_samples)
 
 		

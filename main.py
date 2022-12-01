@@ -3,10 +3,9 @@ from tqdm import tqdm	# command line progress bar
 from PIL import Image, ImageOps	# loading images
 import os				# access to local filess
 from enum import Enum	# create enums
-import string
 import random
 import matplotlib.pyplot as plt
-import copy
+import constants as const
  
 from neuralNetwork import NeuralNetwork
 
@@ -14,36 +13,28 @@ class Mode(Enum):
     TRAINING = 1
     TESTING = 2
 
-DATASET_FOLDER_NAME = "dataset" # dataset | dataset_alt
-LEARNING_RATE = 0.5
-SIZE_HIDDEN_LAYER = 8*8
-EPOCHS = 1
-TRAINING_TEST_RATIO = 0.8
-
 class Main:
 
 	# static data
 	emotionFolderNames = [
 		"anger", 
-		"contempt", 
 		"disgust", 
 		"fear", 
-		"happiness", 
-		"neutrality", 
-		"sadness",
-		"surprise"
+		"happy", 
+		"neutral", 
+		"sad", 
+		"surprise",
 		# "negative", 
 		# "positive"
 	]
 	correctOutput = np.array([
-		[1,0,0,0,0,0,0,0], # anger
-		[0,1,0,0,0,0,0,0], # contempt
-		[0,0,1,0,0,0,0,0], # digust
-		[0,0,0,1,0,0,0,0], # fear
-		[0,0,0,0,1,0,0,0], # happiness
-		[0,0,0,0,0,1,0,0], # neutrality
-		[0,0,0,0,0,0,1,0], # sadness
-		[0,0,0,0,0,0,0,1]  # surprise
+		[1,0,0,0,0,0,0], # anger
+		[0,1,0,0,0,0,0], # disgust
+		[0,0,1,0,0,0,0], # fear
+		[0,0,0,1,0,0,0], # happy
+		[0,0,0,0,1,0,0], # neutral
+		[0,0,0,0,0,1,0], # sad
+		[0,0,0,0,0,0,1], # surprise
 		# [1, 0], # negative
 		# [0, 1],  # positive
 	])
@@ -57,15 +48,15 @@ class Main:
 		# 	return self.emotionFolderNames[0]
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
-		emotionFolderPath = os.getcwd() + '/' + DATASET_FOLDER_NAME + '/' + emotionFolderName
+		emotionFolderPath = os.getcwd() + '/' + const.DATASET_FOLDER_NAME + '/' + emotionFolderName
 
 		fileNames = [] 
 		for name in os.listdir(emotionFolderPath):
-			if name.endswith('.png') is False: continue
+			if name.endswith('.jpg') is False: continue
 			fileNames.append(name)
 		
 		totalCount = len(fileNames)
-		trainingCount = round(totalCount * TRAINING_TEST_RATIO)
+		trainingCount = round(totalCount * const.TRAINING_TEST_RATIO)
 
 		random.shuffle(fileNames)
 
@@ -76,7 +67,7 @@ class Main:
 			return fileNames[testingCount:]
 
 	def loadImage(self, emotionFolderName, fileName):
-			path = DATASET_FOLDER_NAME + '/' + emotionFolderName + '/' + fileName
+			path = const.DATASET_FOLDER_NAME + '/' + emotionFolderName + '/' + fileName
 			
 			image = Image.open(path)
 			image = ImageOps.grayscale(image)
@@ -90,13 +81,13 @@ class Main:
 		print("🛠️  Setting Up")
 		
 		# create nn
-		sizeOfInputLayer = 224 * 224 # based on image size
+		sizeOfInputLayer = 48 * 48 # based on image size
 		sizeOfOutputLayer = len(self.correctOutput[0])
-		self.network = NeuralNetwork(sizeOfInputLayer, SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
+		self.network = NeuralNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 		# Setup debug plot
-		self.ihWeightSamples = np.empty((0,20), int)
-		self.hoWeightSamples = np.empty((0,20), int)
+		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
+		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
 
 	def train(self, epoch):
 		print(f"\n🎛️  Training #{epoch + 1}")
@@ -121,7 +112,7 @@ class Main:
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 			
 			imageInput = self.loadImage(emotion, fileName)
-			(ihWeightSample, hoWeightSample) = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
+			(ihWeightSample, hoWeightSample) = self.network.train(const.LEARNING_RATE, imageInput, expectedOutput)
 
 			self.ihWeightSamples = np.append(self.ihWeightSamples, [ihWeightSample], axis=0)
 			self.hoWeightSamples = np.append(self.hoWeightSamples, [hoWeightSample], axis=0)
@@ -190,7 +181,7 @@ if __name__ == "__main__":
 
 	print("")
 	main.setup()
-	for epoch in range(EPOCHS):
+	for epoch in range(const.EPOCHS):
 		main.train(epoch)
 	main.test()
 	main.showDebugPlot()

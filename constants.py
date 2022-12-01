@@ -1,0 +1,9 @@
+DATASET_FOLDER_NAME = "dataset_three" # dataset | dataset_alt
+
+EPOCHS = 1
+LEARNING_RATE = 0.2
+
+SIZE_HIDDEN_LAYER = 3000
+NUM_WEIGHT_SAMPLES = 20
+
+TRAINING_TEST_RATIO = 0.4
