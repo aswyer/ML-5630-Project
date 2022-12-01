@@ -23,7 +23,11 @@ class NeuralNetwork:
 		# return np.full((rows,columns), 0.1)
 
 	def sigmoid(self, x):
-		return 1 / (1 + np.exp(-1 * x))
+		return 1 / (1 + np.exp(-x))
+	
+	# assume x has been run through sigmoid already
+	def derivative_of_sigmoid(self, x):
+		return x * (1 - x)
 
 	def feedfoward(self, input):
 
@@ -66,12 +70,12 @@ class NeuralNetwork:
 		output_activated = self.sigmoid(output_withBias)
 		# ---------------------------------------------------------------------
 
-		# Update Weights
 
+		# Update hidden -> output weights
 		# output error
 		output_errors = correctOutput - output_activated
 		# output gradient
-		output_gradients = output_activated * (1 - output_activated) 	# sigmoid * (1 - sigmoid)
+		output_gradients = self.derivative_of_sigmoid(output_activated)
 		output_gradients = np.multiply(output_gradients, output_errors) # * E
 		output_gradients = output_gradients * lr						# * lr
 		# hidden -> output deltas
@@ -82,11 +86,13 @@ class NeuralNetwork:
 		# update bias
 		self.bias_output = np.add(self.bias_output, output_gradients)
 		
+
+		# Update input -> hidden weights
 		# hidden error
 		weights_hidden_output_transposed = np.transpose(self.weights_hidden_output) 
 		hidden_errors = np.matmul(weights_hidden_output_transposed, output_errors) # feed backwards to get error at the hidden layer
 		# hidden gradient
-		hidden_gradients = hidden_activated * (1 - hidden_activated)
+		hidden_gradients = self.derivative_of_sigmoid(hidden_activated)
 		hidden_gradients = np.multiply(hidden_gradients, hidden_errors)
 		hidden_gradients = hidden_gradients * lr
 		# input -> hidden deltas
@@ -96,6 +102,11 @@ class NeuralNetwork:
 		self.weights_input_hidden = self.weights_input_hidden + weights_input_hidden_deltas
 		# update bias
 		self.bias_hidden = np.add(self.bias_hidden, hidden_gradients)
+
+
+		# !!! hidden_gradients is so small it results in weights_input_hidden changing very little
+
+
 
 		# return debug values to plot
 		ih_flattened = self.weights_input_hidden.flat

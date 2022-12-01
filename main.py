@@ -16,7 +16,7 @@ class Mode(Enum):
 
 DATASET_FOLDER_NAME = "dataset" # dataset | dataset_alt
 LEARNING_RATE = 0.5
-SIZE_HIDDEN_LAYER = 20
+SIZE_HIDDEN_LAYER = 8*8
 EPOCHS = 1
 TRAINING_TEST_RATIO = 0.8
 
@@ -67,14 +67,13 @@ class Main:
 		totalCount = len(fileNames)
 		trainingCount = round(totalCount * TRAINING_TEST_RATIO)
 
-		fileNamesRand = copy.copy(fileNames)
 		random.shuffle(fileNames)
 
 		if mode is Mode.TRAINING:
-			return fileNamesRand[:trainingCount]
+			return fileNames[:trainingCount]
 		else:
 			testingCount = totalCount - trainingCount
-			return fileNamesRand[testingCount:]
+			return fileNames[testingCount:]
 
 	def loadImage(self, emotionFolderName, fileName):
 			path = DATASET_FOLDER_NAME + '/' + emotionFolderName + '/' + fileName
@@ -95,6 +94,10 @@ class Main:
 		sizeOfOutputLayer = len(self.correctOutput[0])
 		self.network = NeuralNetwork(sizeOfInputLayer, SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
+		# Setup debug plot
+		self.ihWeightSamples = np.empty((0,20), int)
+		self.hoWeightSamples = np.empty((0,20), int)
+
 	def train(self, epoch):
 		print(f"\n🎛️  Training #{epoch + 1}")
 
@@ -110,10 +113,6 @@ class Main:
 		# Shuffle images
 		random.shuffle(imageAssets)
 
-		# Setup debug plot
-		ihWeightSamples = np.empty((0,20), int)
-		hoWeightSamples = np.empty((0,20), int)
-
 		# Train for each image
 		for imageAsset in tqdm(imageAssets, leave=False):
 			(emotion, emotionIndex, fileName) = imageAsset
@@ -124,17 +123,8 @@ class Main:
 			imageInput = self.loadImage(emotion, fileName)
 			(ihWeightSample, hoWeightSample) = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
 
-			ihWeightSamples = np.append(ihWeightSamples, [ihWeightSample], axis=0)
-			hoWeightSamples = np.append(hoWeightSamples, [hoWeightSample], axis=0)
-
-		# Configure & show debug plot
-		x = np.arange(0, len(ihWeightSamples), 1)
-
-		fig, axs = plt.subplots(2)
-		axs[0].plot(x, ihWeightSamples)
-		axs[1].plot(x, -hoWeightSamples)
-		axs[0].set_title('input -> hidden weights (sampled)')
-		axs[1].set_title('hidden -> output weights (sampled)')
+			self.ihWeightSamples = np.append(self.ihWeightSamples, [ihWeightSample], axis=0)
+			self.hoWeightSamples = np.append(self.hoWeightSamples, [hoWeightSample], axis=0)
 				
 
 	def test(self):
@@ -181,6 +171,17 @@ class Main:
 
 		for index, emotion in enumerate(self.emotionFolderNames):
 			print(f"- {emotion.capitalize()}: {specific_percentages[index]}%")
+
+	def showDebugPlot(self):
+		# Configure & show debug plot
+		x = np.arange(0, len(self.ihWeightSamples), 1)
+
+		fig, axs = plt.subplots(2)
+		axs[0].plot(x, self.ihWeightSamples)
+		axs[1].plot(x, -self.hoWeightSamples)
+		axs[0].set_title('input -> hidden weights (sampled)')
+		axs[1].set_title('hidden -> output weights (sampled)')
+		plt.show()
 		
 
 
@@ -192,10 +193,10 @@ if __name__ == "__main__":
 	for epoch in range(EPOCHS):
 		main.train(epoch)
 	main.test()
-	
+	main.showDebugPlot()
+
 	# if want to test specific image set breakpoint on print("") & run the below code in the debug console:
 	# imageData = main.loadImage("positive", "positive_2.png")
 	# print(main.network.feedfoward(imageData))
 
 	print("")
-	plt.show()
