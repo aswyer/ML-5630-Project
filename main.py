@@ -14,8 +14,8 @@ class Mode(Enum):
     TRAINING = 1
     TESTING = 2
 
-DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = .1
+DATASET_FOLDER_NAME = "dataset" # dataset | dataset_alt
+LEARNING_RATE = 0.5
 SIZE_HIDDEN_LAYER = 20
 EPOCHS = 1
 
@@ -110,7 +110,8 @@ class Main:
 		random.shuffle(imageAssets)
 
 		# Setup debug plot
-		y = np.empty((0,20), int)
+		ihWeightSamples = np.empty((0,20), int)
+		hoWeightSamples = np.empty((0,20), int)
 
 		# Train for each image
 		for imageAsset in tqdm(imageAssets, leave=False):
@@ -120,14 +121,19 @@ class Main:
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 			
 			imageInput = self.loadImage(emotion, fileName)
-			debugValue = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
+			(ihWeightSample, hoWeightSample) = self.network.train(LEARNING_RATE, imageInput, expectedOutput)
 
-			y = np.append(y, [debugValue], axis=0)
+			ihWeightSamples = np.append(ihWeightSamples, [ihWeightSample], axis=0)
+			hoWeightSamples = np.append(hoWeightSamples, [hoWeightSample], axis=0)
 
 		# Configure & show debug plot
-		x = np.arange(0, len(y), 1)
-		plot = plt.plot(x,y)
-		#plt.show()
+		x = np.arange(0, len(ihWeightSamples), 1)
+
+		fig, axs = plt.subplots(2)
+		axs[0].plot(x, ihWeightSamples)
+		axs[1].plot(x, -hoWeightSamples)
+		axs[0].set_title('input -> hidden weights (sampled)')
+		axs[1].set_title('hidden -> output weights (sampled)')
 				
 
 	def test(self):

@@ -10,15 +10,17 @@ class NeuralNetwork:
 		self.numOutputNodes = numOutputNodes
 
 		# weights between each node
-		self.weights_input_hidden = self.randomColumn(numHiddenNodes, numInputNodes)
-		self.weights_hidden_output = self.randomColumn(numOutputNodes, numHiddenNodes)
+		self.weights_input_hidden = self.random(numHiddenNodes, numInputNodes)
+		self.weights_hidden_output = self.random(numOutputNodes, numHiddenNodes)
 
 		# bias value for each node (hidden & output)
-		self.bias_hidden = self.randomColumn(numHiddenNodes, 1)
-		self.bias_output = self.randomColumn(numOutputNodes, 1)
+		self.bias_hidden = self.random(numHiddenNodes, 1)
+		self.bias_output = self.random(numOutputNodes, 1)
 
-	def randomColumn(self, rows, columns):
+	def random(self, rows, columns):
 		return np.random.rand(rows, columns) * 2 - 1
+		# return np.zeros((rows, columns))
+		# return np.full((rows,columns), 0.1)
 
 	def sigmoid(self, x):
 		return 1 / (1 + np.exp(-1 * x))
@@ -45,8 +47,6 @@ class NeuralNetwork:
 
 	# Backpropigation
 	def train(self, lr, input, correctOutput):
-
-		# Get current output
 
 		# ---------------- Same code as seen in feedfoward() ------------------
 		# Outputs of "Hidden" Layer
@@ -82,7 +82,8 @@ class NeuralNetwork:
 		# update bias
 		self.bias_output = np.add(self.bias_output, output_gradients)
 
-
+		############# why is each item the same value in every column of weights_hidden_output
+		
 		# hidden error
 		weights_hidden_output_transposed = np.transpose(self.weights_hidden_output) 
 		hidden_errors = np.matmul(weights_hidden_output_transposed, output_errors) # feed backwards to get error at the hidden layer
@@ -100,9 +101,12 @@ class NeuralNetwork:
 		# update bias
 		self.bias_hidden = np.add(self.bias_hidden, hidden_gradients)
 
-		# return debug value to plot
-		flattened = self.weights_input_hidden.flat
-		return flattened[::int(np.ceil(len(flattened)/20))]
+		# return debug values to plot
+		ih_flattened = self.weights_input_hidden.flat
+		ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/20))]
+		ho_flattened = self.weights_hidden_output.flat
+		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/20))]
+		return (ih_samples, ho_samples)
 		# np.random.choice(self.weights_input_hidden.flat, size=3, replace=False)
 		# self.weights_input_hidden.flatten()
 		# self.weights_hidden_output[7]
