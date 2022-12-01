@@ -6,6 +6,7 @@ from enum import Enum	# create enums
 import string
 import random
 import matplotlib.pyplot as plt
+import copy
  
 from neuralNetwork import NeuralNetwork
 
@@ -14,7 +15,7 @@ class Mode(Enum):
     TESTING = 2
 
 DATASET_FOLDER_NAME = "dataset" #dataset_alt
-LEARNING_RATE = 0.1
+LEARNING_RATE = .1
 SIZE_HIDDEN_LAYER = 20
 EPOCHS = 1
 
@@ -65,11 +66,14 @@ class Main:
 		totalCount = len(fileNames)
 		trainingCount = round(totalCount * 0.9)
 
+		fileNamesRand = copy.copy(fileNames)
+		random.shuffle(fileNames)
+
 		if mode is Mode.TRAINING:
-			return fileNames[:trainingCount]
+			return fileNamesRand[:trainingCount]
 		else:
 			testingCount = totalCount - trainingCount
-			return fileNames[testingCount:]
+			return fileNamesRand[testingCount:]
 
 	def loadImage(self, emotionFolderName, fileName):
 			path = DATASET_FOLDER_NAME + '/' + emotionFolderName + '/' + fileName
@@ -123,7 +127,7 @@ class Main:
 		# Configure & show debug plot
 		x = np.arange(0, len(y), 1)
 		plot = plt.plot(x,y)
-		plt.show()
+		#plt.show()
 				
 
 	def test(self):
