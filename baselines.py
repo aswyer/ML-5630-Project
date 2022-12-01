@@ -1,66 +1,183 @@
-######Imports######
-from sklearn.ensemble import RandomForestClassifier
-import numpy as np
-import main
+import numpy as np		# arrays & matricies
+from tqdm import tqdm	# command line progress bar
+from PIL import Image, ImageOps	# loading images
+import os				# access to local filess
+from enum import Enum	# create enums
 import random
 import matplotlib.pyplot as plt
-import pandas as pd
-import os
-import cv2
-from pathlib import Path
-from PIL import Image, ImageOps
-from sklearn.utils import Bunch
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
-######Imports######
+import constants as const
+from sklearn.neural_network import MLPClassifier
+ 
+from neuralNetwork import NeuralNetwork
 
-DATASET_FOLDER_NAME = "dataset"
-emotionFolderNames = [
+class Mode(Enum):
+    TRAINING = 1
+    TESTING = 2
+
+class Baselines:
+
+	# static data
+	emotionFolderNames = [
 		"anger", 
-		"contempt", 
 		"disgust", 
 		"fear", 
-		"happiness", 
-		"neutrality", 
-		"sadness",
-		"surprise"
+		"happy", 
+		"neutral", 
+		"sad", 
+		"surprise",
 		# "negative", 
 		# "positive"
 	]
-# 
-fileNames = []
-flatFiles = []
-targets = []
+	correctOutput = np.array([
+		[1,0,0,0,0,0,0], # anger
+		[0,1,0,0,0,0,0], # disgust
+		[0,0,1,0,0,0,0], # fear
+		[0,0,0,1,0,0,0], # happy
+		[0,0,0,0,1,0,0], # neutral
+		[0,0,0,0,0,1,0], # sad
+		[0,0,0,0,0,0,1], # surprise
+		# [1, 0], # negative
+		# [0, 1],  # positive
+	])
 
-def load_images():
-	for i, emotion in enumerate(emotionFolderNames):
-		emotionFolderPath = os.getcwd() + '/' + DATASET_FOLDER_NAME + '/' + emotion
+	def emotionFromOutputArray(self, output):
+		highestValueIndex = np.argmax(output)
+		return self.emotionFolderNames[highestValueIndex]
+		# if output[1] > output[0]:
+		# 	return self.emotionFolderNames[1]
+		# else:
+		# 	return self.emotionFolderNames[0]
+	
+	def fileNames(self, emotionFolderName, mode: Mode):
+		emotionFolderPath = os.getcwd() + '/' + const.DATASET_FOLDER_NAME + '/' + emotionFolderName
+
+		fileNames = [] 
 		for name in os.listdir(emotionFolderPath):
-			emotionFolderPath = os.getcwd() + '/' + DATASET_FOLDER_NAME + '/' + emotion
-			if name.endswith('.png') is False: continue
-			path = DATASET_FOLDER_NAME + '/' + emotion + '/' + name
+			if name.endswith('.jpg') is False: continue
+			fileNames.append(name)
+		
+		totalCount = len(fileNames)
+		trainingCount = round(totalCount * const.TRAINING_TEST_RATIO)
+
+		random.shuffle(fileNames)
+
+		if mode is Mode.TRAINING:
+			return fileNames[:trainingCount]
+		else:
+			testingCount = totalCount - trainingCount
+			return fileNames[testingCount:]
+
+	def loadImage(self, emotionFolderName, fileName):
+			path = const.DATASET_FOLDER_NAME + '/' + emotionFolderName + '/' + fileName
+			
 			image = Image.open(path)
 			image = ImageOps.grayscale(image)
-			array = np.array(image)
-			fileNames.append(array)
-			flatFiles.append(array.flatten())
-			targets.append(i)
+			array = np.array(image).flatten()
+			array = np.reshape(array, (len(array), 1))
+			normalized = (array / 255) * 2 - 1
+			return normalized
 
-	flat_data = np.array(flatFiles)
-	target_array = np.array(targets)
-	image_array = np.array(fileNames)
 
-	return Bunch(data = flat_data, target = target_array, target_names = emotionFolderNames)
+	def setup(self):
+		print("🛠️  Setting Up")
+		
+		# create nn
+		sizeOfInputLayer = 48 * 48 # based on image size
+		sizeOfOutputLayer = len(self.correctOutput[0])
+		self.network = MLPClassifier(hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER,), random_state=1, max_iter=300)
 
-	
-image_dataset = load_images()
-X_train, X_test, y_train, y_test = train_test_split(image_dataset.data, image_dataset.target, test_size=0.9, random_state = 109)
+		# Setup debug plot
+		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
+		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
 
-rf = RandomForestClassifier()
-rf.fit(X_train, y_train)
+	def getImageAssets(self):
+		imageAssets = []
 
-y_pred = rf.predict(X_test)
-mse_score = mean_squared_error(y_test, y_pred)
-r2score = r2_score(y_test, y_pred)
-print("MSE is: ", mse_score)
-print("R2 score is: ", r2score)
+		for (emotionIndex, emotion) in enumerate(self.emotionFolderNames):
+			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
+
+			for fileName in imageFileNames:
+				imageAssets.append((emotion, emotionIndex, fileName))
+
+		# Shuffle images
+		random.shuffle(imageAssets)
+
+		return imageAssets
+
+	def train(self):
+		print(f"\n🎛️  Training")
+
+		# Get all images
+		allImageAssets = self.getImageAssets()
+
+		# Train for each image
+		for imageAsset in tqdm(allImageAssets, leave=False):
+			(emotion, emotionIndex, fileName) = imageAsset
+			
+			imageInput = self.loadImage(emotion, fileName)
+			expectedOutput = self.correctOutput[emotionIndex]
+
+			self.network.partial_fit(imageInput, expectedOutput, self.emotionFolderNames) # ERROR being thrown here
+				
+
+	def test(self):
+		print("\n📊 Testing")
+
+		# Stat variables
+		numOfImagesTested_total = 0
+		numOfCorrectlyClassified_total = 0
+		specific_percentages = []
+
+		# Test each emotion
+		for emotion in tqdm(self.emotionFolderNames, leave=False):
+
+			# Stats for this specific emotion
+			numOfCorrectlyClassified_specific = 0
+
+			# Get image filenames for testing
+			imageFileNames = self.fileNames(emotion, Mode.TESTING)
+			numOfImagesTested_specific = len(imageFileNames)
+
+			# Go through each file in this emotion
+			for fileName in imageFileNames:
+
+				# Load image & process it with the neural network
+				imageData = self.loadImage(emotion, fileName)
+				
+				output = self.network.predict_proba(imageData)
+				
+				# Compare to the correct output
+				predictedEmotion = self.emotionFromOutputArray(output)
+				if predictedEmotion == emotion:
+					numOfCorrectlyClassified_specific += 1
+
+			# Update total stats from specifc stats
+			numOfImagesTested_total += numOfImagesTested_specific
+			numOfCorrectlyClassified_total += numOfCorrectlyClassified_specific
+
+			# Save specific stats
+			percentage = (numOfCorrectlyClassified_specific / numOfImagesTested_specific) * 100
+			specific_percentages.append(percentage)
+
+		# Print stats
+		percentage = (numOfCorrectlyClassified_total / numOfImagesTested_total) * 100
+		print(f"Accuracy: {percentage}%")
+
+		for index, emotion in enumerate(self.emotionFolderNames):
+			print(f"- {emotion.capitalize()}: {specific_percentages[index]}%")
+		
+
+
+if __name__ == "__main__":
+	main = Baselines()
+
+	print("")
+	main.setup()
+	main.train()
+	main.test()
+
+	# if want to test specific image set breakpoint on print("") & run the below code in the debug console:
+	# imageData = main.loadImage("positive", "positive_2.png")
+	# print(main.network.feedfoward(imageData))
+
+	print("")

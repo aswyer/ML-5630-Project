@@ -5,10 +5,18 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Python: Current File",
+			"name": "Custom MLP",
 			"type": "python",
 			"request": "launch",
 			"program": "main.py", 
+			"console": "integratedTerminal",
+			"justMyCode": true
+		},
+		{
+			"name": "Baselines",
+			"type": "python",
+			"request": "launch",
+			"program": "baselines.py", 
 			"console": "integratedTerminal",
 			"justMyCode": true
 		}

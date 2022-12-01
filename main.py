@@ -89,10 +89,7 @@ class Main:
 		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
 		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
 
-	def train(self, epoch):
-		print(f"\n🎛️  Training #{epoch + 1}")
-
-		# Get all images
+	def getImageAssets(self):
 		imageAssets = []
 
 		for (emotionIndex, emotion) in enumerate(self.emotionFolderNames):
@@ -104,8 +101,16 @@ class Main:
 		# Shuffle images
 		random.shuffle(imageAssets)
 
+		return imageAssets
+
+	def train(self, epoch):
+		print(f"\n🎛️  Training #{epoch + 1}")
+
+		# Get all images
+		allImageAssets = self.getImageAssets()
+
 		# Train for each image
-		for imageAsset in tqdm(imageAssets, leave=False):
+		for imageAsset in tqdm(allImageAssets, leave=False):
 			(emotion, emotionIndex, fileName) = imageAsset
 			
 			expectedOutput = self.correctOutput[emotionIndex]
