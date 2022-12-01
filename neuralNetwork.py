@@ -81,8 +81,6 @@ class NeuralNetwork:
 		self.weights_hidden_output = self.weights_hidden_output + weights_hidden_output_deltas
 		# update bias
 		self.bias_output = np.add(self.bias_output, output_gradients)
-
-		############# why is each item the same value in every column of weights_hidden_output
 		
 		# hidden error
 		weights_hidden_output_transposed = np.transpose(self.weights_hidden_output) 
@@ -96,8 +94,6 @@ class NeuralNetwork:
 		weights_input_hidden_deltas = np.matmul(hidden_gradients, inputs_transposed)
 		# update weights
 		self.weights_input_hidden = self.weights_input_hidden + weights_input_hidden_deltas
-		if math.isnan(self.weights_input_hidden[0][0]):
-			print("NAN")
 		# update bias
 		self.bias_hidden = np.add(self.bias_hidden, hidden_gradients)
 
@@ -107,12 +103,5 @@ class NeuralNetwork:
 		ho_flattened = self.weights_hidden_output.flat
 		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/20))]
 		return (ih_samples, ho_samples)
-		# np.random.choice(self.weights_input_hidden.flat, size=3, replace=False)
-		# self.weights_input_hidden.flatten()
-		# self.weights_hidden_output[7]
-		# np.std(self.weights_hidden_output)
-		# self.bias_output
-		# self.bias_hidden
-		# np.sum(np.power(output_error, 2))
 
 		

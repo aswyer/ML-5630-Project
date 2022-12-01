@@ -18,6 +18,7 @@ DATASET_FOLDER_NAME = "dataset" # dataset | dataset_alt
 LEARNING_RATE = 0.5
 SIZE_HIDDEN_LAYER = 20
 EPOCHS = 1
+TRAINING_TEST_RATIO = 0.8
 
 class Main:
 
@@ -64,7 +65,7 @@ class Main:
 			fileNames.append(name)
 		
 		totalCount = len(fileNames)
-		trainingCount = round(totalCount * 0.9)
+		trainingCount = round(totalCount * TRAINING_TEST_RATIO)
 
 		fileNamesRand = copy.copy(fileNames)
 		random.shuffle(fileNames)
