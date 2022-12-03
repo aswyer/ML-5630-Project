@@ -109,14 +109,21 @@ class Main:
 		allImageAssets = self.getImageAssets(Mode.TRAINING)
 
 		# Train for each image
-		for imageAsset in tqdm(allImageAssets, leave=False):
+		for i, imageAsset in enumerate(tqdm(allImageAssets, leave=False)):
 			(emotion, emotionIndex, fileName) = imageAsset
 			
 			expectedOutput = self.correctOutput[emotionIndex]
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 			
 			imageInput = self.loadImage(emotion, fileName)
-			(ihWeightSample, hoWeightSample) = self.network.train(const.LEARNING_RATE, imageInput, expectedOutput)
+			
+			# adjust learning rate if LR_INVERSE_SCALING_ON is true
+			learningRate = const.MAX_LEARNING_RATE
+			if const.LR_INVERSE_SCALING_ON:
+				percentageIncomplete = 1 - (i / len(allImageAssets))
+				learningRate *= pow(percentageIncomplete, 2)
+
+			(ihWeightSample, hoWeightSample) = self.network.train(learningRate, imageInput, expectedOutput)
 
 			self.ihWeightSamples = np.append(self.ihWeightSamples, [ihWeightSample], axis=0)
 			self.hoWeightSamples = np.append(self.hoWeightSamples, [hoWeightSample], axis=0)
