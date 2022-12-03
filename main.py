@@ -17,15 +17,20 @@ class Main:
 
 	# static data
 	emotionFolderNames = [
-		"anger", 
-		"disgust", 
-		"fear", 
-		"happy", 
-		"neutral", 
-		"sad", 
-		"surprise",
-		# "negative", 
-		# "positive"
+		# "anger", 
+		# "disgust", 
+		# "fear", 
+		# "happy", 
+		# "neutral", 
+		# "sad", 
+		# "surprise",
+		"1", 
+		"2", 
+		"3", 
+		"4", 
+		"5", 
+		"6", 
+		"7",
 	]
 	correctOutput = np.array([
 		[1,0,0,0,0,0,0], # anger
@@ -81,7 +86,7 @@ class Main:
 		print("🛠️  Setting Up")
 		
 		# create nn
-		sizeOfInputLayer = 48 * 48 # based on image size
+		sizeOfInputLayer = pow(const.INPUT_IMAGE_SIZE, 2) # based on image size
 		sizeOfOutputLayer = len(self.correctOutput[0])
 		self.network = NeuralNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
@@ -89,11 +94,11 @@ class Main:
 		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
 		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
 
-	def getImageAssets(self):
+	def getImageAssets(self, mode):
 		imageAssets = []
 
 		for (emotionIndex, emotion) in enumerate(self.emotionFolderNames):
-			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
+			imageFileNames = self.fileNames(emotion, mode)
 
 			for fileName in imageFileNames:
 				imageAssets.append((emotion, emotionIndex, fileName))
@@ -107,7 +112,7 @@ class Main:
 		print(f"\n🎛️  Training #{epoch + 1}")
 
 		# Get all images
-		allImageAssets = self.getImageAssets()
+		allImageAssets = self.getImageAssets(Mode.TRAINING)
 
 		# Train for each image
 		for imageAsset in tqdm(allImageAssets, leave=False):
@@ -132,6 +137,7 @@ class Main:
 		specific_percentages = []
 
 		# Test each emotion
+		# TODO: update to use getImageAssets()
 		for emotion in tqdm(self.emotionFolderNames, leave=False):
 
 			# Stats for this specific emotion
