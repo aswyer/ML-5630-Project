@@ -17,20 +17,20 @@ class Main:
 
 	# static data
 	emotionFolderNames = [
-		# "anger", 
-		# "disgust", 
-		# "fear", 
-		# "happy", 
-		# "neutral", 
-		# "sad", 
-		# "surprise",
-		"1", 
-		"2", 
-		"3", 
-		"4", 
-		"5", 
-		"6", 
-		"7",
+		"anger", 
+		"disgust", 
+		"fear", 
+		"happy", 
+		"neutral", 
+		"sad", 
+		"surprise"
+		# "1", 
+		# "2", 
+		# "3", 
+		# "4", 
+		# "5", 
+		# "6", 
+		# "7",
 	]
 	correctOutput = np.array([
 		[1,0,0,0,0,0,0], # anger
