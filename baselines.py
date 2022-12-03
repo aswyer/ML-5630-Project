@@ -7,8 +7,9 @@ import random
 import matplotlib.pyplot as plt
 import constants as const
 from sklearn.neural_network import MLPClassifier
- 
 from neuralNetwork import NeuralNetwork
+
+# TODO: Refactor this file to share code with main.py
 
 class Mode(Enum):
     TRAINING = 1
@@ -24,9 +25,7 @@ class Baselines:
 		"happy", 
 		"neutral", 
 		"sad", 
-		"surprise",
-		# "negative", 
-		# "positive"
+		"surprise"
 	]
 	correctOutput = np.array([
 		[1,0,0,0,0,0,0], # anger
@@ -36,17 +35,11 @@ class Baselines:
 		[0,0,0,0,1,0,0], # neutral
 		[0,0,0,0,0,1,0], # sad
 		[0,0,0,0,0,0,1], # surprise
-		# [1, 0], # negative
-		# [0, 1],  # positive
 	])
 
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
 		return self.emotionFolderNames[highestValueIndex]
-		# if output[1] > output[0]:
-		# 	return self.emotionFolderNames[1]
-		# else:
-		# 	return self.emotionFolderNames[0]
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
 		emotionFolderPath = os.getcwd() + '/' + const.DATASET_FOLDER_NAME + '/' + emotionFolderName
