@@ -82,9 +82,7 @@ class Baselines:
 		print("🛠️  Setting Up")
 		
 		# create nn
-		sizeOfInputLayer = 48 * 48 # based on image size
-		sizeOfOutputLayer = len(self.correctOutput[0])
-		self.network = MLPClassifier(hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER,), random_state=1, max_iter=300)
+		self.network = MLPClassifier(activation='logistic', hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER,3), random_state=1)
 
 		# Setup debug plot
 		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
@@ -114,10 +112,11 @@ class Baselines:
 		for imageAsset in tqdm(allImageAssets, leave=False):
 			(emotion, emotionIndex, fileName) = imageAsset
 			
-			imageInput = self.loadImage(emotion, fileName)
+			imageInput = self.loadImage(emotion, fileName).transpose()
 			expectedOutput = self.correctOutput[emotionIndex]
+			expectedOutput = self.emotionFromOutputArray(expectedOutput)
 
-			self.network.partial_fit(imageInput, expectedOutput, self.emotionFolderNames) # ERROR being thrown here
+			self.network.partial_fit(imageInput, [expectedOutput], self.emotionFolderNames) # ERROR being thrown here
 				
 
 	def test(self):
@@ -142,7 +141,7 @@ class Baselines:
 			for fileName in imageFileNames:
 
 				# Load image & process it with the neural network
-				imageData = self.loadImage(emotion, fileName)
+				imageData = self.loadImage(emotion, fileName).transpose()
 				
 				output = self.network.predict_proba(imageData)
 				
