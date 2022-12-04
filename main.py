@@ -45,6 +45,7 @@ class Main:
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
 		return self.emotionFolderNames[highestValueIndex]
+
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
 		emotionFolderPath = os.getcwd() + '/' + const.DATASET_FOLDER_NAME + '/' + emotionFolderName
@@ -137,10 +138,12 @@ class Main:
 		numOfCorrectlyClassified_total = 0
 		specific_percentages = []
 
+		squared_error = np.zeros((len(self.emotionFolderNames,)))
+
 		# Test each emotion
 		# TODO: Implement MSE as well. Output both MSE & % correct.
 		# TODO: update to use getImageAssets()
-		for emotion in tqdm(self.emotionFolderNames, leave=False):
+		for (emotionIndex, emotion) in enumerate(tqdm(self.emotionFolderNames, leave=False)):
 
 			# Stats for this specific emotion
 			numOfCorrectlyClassified_specific = 0
@@ -155,6 +158,12 @@ class Main:
 				# Load image & process it with the neural network
 				imageData = self.loadImage(emotion, fileName)
 				output = self.network.feedfoward(imageData)
+
+				# MSE 
+				correctOutput = self.correctOutput[emotionIndex]
+				error = correctOutput - output
+				squared = np.square(error)
+				squared_error = np.add(squared_error, squared)
 				
 				# Compare to the correct output
 				predictedEmotion = self.emotionFromOutputArray(output)
@@ -169,12 +178,19 @@ class Main:
 			percentage = (numOfCorrectlyClassified_specific / numOfImagesTested_specific) * 100
 			specific_percentages.append(percentage)
 
+		# Calc MSE
+		mse = squared_error / numOfImagesTested_total
+
 		# Print stats
 		percentage = (numOfCorrectlyClassified_total / numOfImagesTested_total) * 100
-		print(f"Accuracy: {percentage}%")
 
+		print(f"Binary Accuracy: {round(percentage,2)}% (avg)")
 		for index, emotion in enumerate(self.emotionFolderNames):
-			print(f"- {emotion.capitalize()}: {specific_percentages[index]}%")
+			print(f"- {emotion.capitalize()}: {round(specific_percentages[index],2)}%")
+
+		print(f"\nMSE: {round(mse.mean(),2)} (avg)")
+		for index, emotion in enumerate(self.emotionFolderNames):
+			print(f"- {emotion.capitalize()}: {round(mse[index],2)}")
 
 	def showDebugPlot(self):
 		# Configure & show debug plot

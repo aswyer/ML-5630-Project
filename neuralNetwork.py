@@ -45,8 +45,8 @@ class NeuralNetwork:
 		output_withBias = np.add(output, self.bias_output)
 		# activate using sigmoid
 		output_activated = self.sigmoid(output_withBias)
-
-		return output_activated
+		reshaped = np.reshape(output_activated, (self.numOutputNodes,))
+		return reshaped
 
 	# Backpropigation
 	def train(self, lr, input, correctOutput):
