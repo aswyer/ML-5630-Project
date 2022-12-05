@@ -27,4 +27,4 @@ SIZE_HIDDEN_LAYER = 300
 NUM_HIDDEN_LAYERS = 1			# Only for baselines. Not implemented in custom MLP.
 
 # Plotting
-NUM_WEIGHT_SAMPLES = 24 		# Number of weight samples to show in the graph. Only for custom MLP.
+NUM_WEIGHT_PLOT_SAMPLES = 24 		# Number of weight samples to show in the graph. Only for custom MLP.

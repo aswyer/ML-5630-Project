@@ -102,7 +102,7 @@ class NeuralNetwork:
 
 		# return debug values to plot
 		ih_flattened = self.weights_input_hidden.flat
-		ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/const.NUM_WEIGHT_SAMPLES))]
+		ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/const.NUM_WEIGHT_PLOT_SAMPLES))]
 		ho_flattened = self.weights_hidden_output.flat
-		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/const.NUM_WEIGHT_SAMPLES))]
+		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/const.NUM_WEIGHT_PLOT_SAMPLES))]
 		return (ih_samples, ho_samples)

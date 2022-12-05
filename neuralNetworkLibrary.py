@@ -59,8 +59,8 @@ class NeuralNetworkLibrary:
 		self.network = NeuralNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 		# Setup debug plot
-		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
-		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
+		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_PLOT_SAMPLES), int)
+		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_PLOT_SAMPLES), int)
 
 	def getImageAssets(self, mode):
 		imageAssets = []

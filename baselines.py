@@ -64,8 +64,8 @@ class Baselines:
 		)
 
 		# Setup debug plot
-		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
-		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
+		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_PLOT_SAMPLES), int)
+		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_PLOT_SAMPLES), int)
 
 	def getImageAssets(self):
 		imageAssets = []
