@@ -1,7 +1,7 @@
-import numpy as np
 import constants as const
+import numpy as np
 
-class NeuralNetwork:
+class MLPNetwork:
 
 	def __init__(self, numInputNodes, numHiddenNodes, numOutputNodes):
 		self.numInputNodes = numInputNodes
