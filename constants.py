@@ -6,6 +6,8 @@ MAX_LEARNING_RATE = 0.1 		# Will be used as constant learning rate if LR_INVERSE
 LR_INVERSE_SCALING_ON = False 	# Currently doesn't support multiple epochs. will cycle scaling for each epoch.
 
 SIZE_HIDDEN_LAYER = 300
+NUM_HIDDEN_LAYERS = 1			# Only for baselines. Not implemented in custom MLP.
+
 NUM_WEIGHT_SAMPLES = 24 		# Number of weight samples to show in the graph
 
-TRAINING_TEST_RATIO = 0.9 		# Percent of data to use for training. (1 - TRAINING_TEST_RATIO) will be used for testing.
+TRAINING_TEST_RATIO = 0.9 		# Percent of data to use for training. (1 - TRAINING_TEST_RATIO) will be used for testing.TRAINING_TEST_RATIO = 0.01 		# Percent of data to use for training. (1 - TRAINING_TEST_RATIO) will be used for testing.

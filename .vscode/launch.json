@@ -5,21 +5,29 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Custom MLP",
+			"name": "Main",
 			"type": "python",
 			"request": "launch",
 			"program": "main.py", 
 			"console": "integratedTerminal",
 			"justMyCode": true
-		},
-		{
-			"name": "Baselines",
-			"type": "python",
-			"request": "launch",
-			"program": "baselines.py", 
-			"console": "integratedTerminal",
-			"justMyCode": true
 		}
+		// {
+		// 	"name": "Custom MLP",
+		// 	"type": "python",
+		// 	"request": "launch",
+		// 	"program": "main.py", 
+		// 	"console": "integratedTerminal",
+		// 	"justMyCode": true
+		// },
+		// {
+		// 	"name": "Baselines",
+		// 	"type": "python",
+		// 	"request": "launch",
+		// 	"program": "baselines.py", 
+		// 	"console": "integratedTerminal",
+		// 	"justMyCode": true
+		// }
 	]
 }
 
