@@ -19,12 +19,20 @@ class MLPNetwork:
 	def random(self, rows, columns):
 		return np.random.rand(rows, columns) * 2 - 1
 
-	def sigmoid(self, x):
-		return 1 / (1 + np.exp(-x))
+	def activationFunc(self, x):
+		return max(0, x) #relu
+		# return 1 / (1 + np.exp(-x)) # sigmoid
 	
 	# assume x has been run through sigmoid already
-	def derivative_of_sigmoid(self, x):
-		return x * (1 - x)
+	def derivative_activationFunc(self, x):
+		# relu
+		if x <= 0:
+			return 0
+		else:
+			return 1
+
+		# sigmoid
+		# return x * (1 - x)
 
 	def feedfoward(self, input):
 
@@ -34,7 +42,7 @@ class MLPNetwork:
 		# add hidden layer bias	
 		hidden_withBias = np.add(hidden, self.bias_hidden)
 		# activate using sigmoid
-		hidden_activated = self.sigmoid(hidden_withBias)
+		hidden_activated = self.activationFunc(hidden_withBias)
 
 		# Outputs of "Output" Layer
 		# dot hidden outputs & hidden->output weights
@@ -42,7 +50,7 @@ class MLPNetwork:
 		# add output layer bias
 		output_withBias = np.add(output, self.bias_output)
 		# activate using sigmoid
-		output_activated = self.sigmoid(output_withBias)
+		output_activated = self.activationFunc(output_withBias)
 		reshaped = np.reshape(output_activated, (self.numOutputNodes,))
 		return reshaped
 
@@ -56,7 +64,7 @@ class MLPNetwork:
 		# add hidden layer bias	
 		hidden_withBias = np.add(hidden, self.bias_hidden)
 		# activate using sigmoid
-		hidden_activated = self.sigmoid(hidden_withBias)
+		hidden_activated = self.activationFunc(hidden_withBias)
 
 		# Outputs of "Output" Layer
 		# dot hidden outputs & hidden->output weights
@@ -64,7 +72,7 @@ class MLPNetwork:
 		# add output layer bias
 		output_withBias = np.add(output, self.bias_output)
 		# activate using sigmoid
-		output_activated = self.sigmoid(output_withBias)
+		output_activated = self.activationFunc(output_withBias)
 		# ---------------------------------------------------------------------
 
 
@@ -72,7 +80,7 @@ class MLPNetwork:
 		# output error
 		output_errors = correctOutput - output_activated
 		# output gradient
-		output_gradients = self.derivative_of_sigmoid(output_activated)
+		output_gradients = self.derivative_activationFunc(output_activated)
 		output_gradients = np.multiply(output_gradients, output_errors) # * E
 		output_gradients = output_gradients * lr						# * lr
 		# hidden -> output deltas
@@ -89,7 +97,7 @@ class MLPNetwork:
 		weights_hidden_output_transposed = np.transpose(self.weights_hidden_output) 
 		hidden_errors = np.matmul(weights_hidden_output_transposed, output_errors) # feed backwards to get error at the hidden layer
 		# hidden gradient
-		hidden_gradients = self.derivative_of_sigmoid(hidden_activated)
+		hidden_gradients = self.derivative_activationFunc(hidden_activated)
 		hidden_gradients = np.multiply(hidden_gradients, hidden_errors)
 		hidden_gradients = hidden_gradients * lr
 		# input -> hidden deltas
