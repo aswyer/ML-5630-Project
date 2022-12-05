@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import constants as const
 from neuralNetwork import NeuralNetwork
 
-#  TODO: refactor this file to be a general purpose library.
+#  TODO: refactor this file to be a more general purpose library.
 
 class Mode(Enum):
 	TRAINING = 1
@@ -16,37 +16,9 @@ class Mode(Enum):
 
 class NeuralNetworkLibrary:
 
-	# static data
-	emotionFolderNames = [
-		"anger", 
-		"disgust", 
-		"fear", 
-		"happy", 
-		"neutral", 
-		"sad", 
-		"surprise"
-		# "1", 
-		# "2", 
-		# "3", 
-		# "4", 
-		# "5", 
-		# "6", 
-		# "7",
-	]
-	correctOutput = np.array([
-		[1,0,0,0,0,0,0], # anger
-		[0,1,0,0,0,0,0], # disgust
-		[0,0,1,0,0,0,0], # fear
-		[0,0,0,1,0,0,0], # happy
-		[0,0,0,0,1,0,0], # neutral
-		[0,0,0,0,0,1,0], # sad
-		[0,0,0,0,0,0,1], # surprise
-	])
-
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
-		return self.emotionFolderNames[highestValueIndex]
-
+		return const.CLASSES[highestValueIndex]
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
 		emotionFolderPath = os.getcwd() + '/' + const.DATASET_FOLDER_NAME + '/' + emotionFolderName
@@ -83,7 +55,7 @@ class NeuralNetworkLibrary:
 		
 		# create nn
 		sizeOfInputLayer = pow(const.INPUT_IMAGE_SIZE, 2) # based on image size
-		sizeOfOutputLayer = len(self.correctOutput[0])
+		sizeOfOutputLayer = len(const.CORRECT_OUTPUT[0])
 		self.network = NeuralNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 		# Setup debug plot
@@ -93,7 +65,7 @@ class NeuralNetworkLibrary:
 	def getImageAssets(self, mode):
 		imageAssets = []
 
-		for (emotionIndex, emotion) in enumerate(self.emotionFolderNames):
+		for (emotionIndex, emotion) in enumerate(const.CLASSES):
 			imageFileNames = self.fileNames(emotion, mode)
 
 			for fileName in imageFileNames:
@@ -114,7 +86,7 @@ class NeuralNetworkLibrary:
 		for i, imageAsset in enumerate(tqdm(allImageAssets, leave=False)):
 			(emotion, emotionIndex, fileName) = imageAsset
 			
-			expectedOutput = self.correctOutput[emotionIndex]
+			expectedOutput = const.CORRECT_OUTPUT[emotionIndex]
 			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
 			
 			imageInput = self.loadImage(emotion, fileName)
@@ -139,12 +111,12 @@ class NeuralNetworkLibrary:
 		numOfCorrectlyClassified_total = 0
 		specific_percentages = []
 
-		squared_error = np.zeros((len(self.emotionFolderNames,)))
+		squared_error = np.zeros((len(const.CLASSES,)))
 
 		# Test each emotion
 		# TODO: Implement MSE as well. Output both MSE & % correct.
 		# TODO: update to use getImageAssets()
-		for (emotionIndex, emotion) in enumerate(tqdm(self.emotionFolderNames, leave=False)):
+		for (emotionIndex, emotion) in enumerate(tqdm(const.CLASSES, leave=False)):
 
 			# Stats for this specific emotion
 			numOfCorrectlyClassified_specific = 0
@@ -161,7 +133,7 @@ class NeuralNetworkLibrary:
 				output = self.network.feedfoward(imageData)
 
 				# MSE 
-				correctOutput = self.correctOutput[emotionIndex]
+				correctOutput = const.CORRECT_OUTPUT[emotionIndex]
 				error = correctOutput - output
 				squared = np.square(error)
 				squared_error = np.add(squared_error, squared)
@@ -186,11 +158,11 @@ class NeuralNetworkLibrary:
 		percentage = (numOfCorrectlyClassified_total / numOfImagesTested_total) * 100
 
 		print(f"Binary Accuracy: {round(percentage,2)}% (avg)")
-		for index, emotion in enumerate(self.emotionFolderNames):
+		for index, emotion in enumerate(const.CLASSES):
 			print(f"- {emotion.capitalize()}: {round(specific_percentages[index],2)}%")
 
 		print(f"\nMSE: {round(mse.mean(),2)} (avg)")
-		for index, emotion in enumerate(self.emotionFolderNames):
+		for index, emotion in enumerate(const.CLASSES):
 			print(f"- {emotion.capitalize()}: {round(mse[index],2)}")
 
 	def showDebugPlot(self):

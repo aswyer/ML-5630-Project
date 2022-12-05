@@ -16,29 +16,9 @@ class Mode(Enum):
 
 class Baselines:
 
-	# static data
-	emotionFolderNames = [
-		"anger", 
-		"disgust", 
-		"fear", 
-		"happy", 
-		"neutral", 
-		"sad", 
-		"surprise"
-	]
-	correctOutput = np.array([
-		[1,0,0,0,0,0,0], # anger
-		[0,1,0,0,0,0,0], # disgust
-		[0,0,1,0,0,0,0], # fear
-		[0,0,0,1,0,0,0], # happy
-		[0,0,0,0,1,0,0], # neutral
-		[0,0,0,0,0,1,0], # sad
-		[0,0,0,0,0,0,1], # surprise
-	])
-
 	def emotionFromOutputArray(self, output):
 		highestValueIndex = np.argmax(output)
-		return self.emotionFolderNames[highestValueIndex]
+		return const.CLASSES[highestValueIndex]
 	
 	def fileNames(self, emotionFolderName, mode: Mode):
 		emotionFolderPath = os.getcwd() + '/' + const.DATASET_FOLDER_NAME + '/' + emotionFolderName
@@ -74,7 +54,7 @@ class Baselines:
 		print("🛠️  Setting Up")
 		
 		# create nn
-		self.network = MLPClassifier(max_iter=const.EPOCHS, activation='logistic', hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER, const.NUM_HIDDEN_LAYERS), random_state=1)
+		self.network = MLPClassifier(max_iter=const.EPOCHS, activation='logistic', hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER, const.NUM_HIDDEN_LAYERS), learning_rate=('invscaling' if const.LR_INVERSE_SCALING_ON else 'constant'), learning_rate_init=const.MAX_LEARNING_RATE,random_state=1)
 
 		# Setup debug plot
 		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
@@ -83,7 +63,7 @@ class Baselines:
 	def getImageAssets(self):
 		imageAssets = []
 
-		for (emotionIndex, emotion) in enumerate(self.emotionFolderNames):
+		for (emotionIndex, emotion) in enumerate(const.CLASSES):
 			imageFileNames = self.fileNames(emotion, Mode.TRAINING)
 
 			for fileName in imageFileNames:
@@ -105,10 +85,10 @@ class Baselines:
 			(emotion, emotionIndex, fileName) = imageAsset
 			
 			imageInput = self.loadImage(emotion, fileName).transpose()
-			expectedOutput = self.correctOutput[emotionIndex]
+			expectedOutput = const.CORRECT_OUTPUT[emotionIndex]
 			expectedOutput = self.emotionFromOutputArray(expectedOutput)
 
-			self.network.partial_fit(imageInput, [expectedOutput], self.emotionFolderNames) # ERROR being thrown here
+			self.network.partial_fit(imageInput, [expectedOutput], const.CLASSES)
 				
 
 	def test(self):
@@ -120,7 +100,7 @@ class Baselines:
 		specific_percentages = []
 
 		# Test each emotion
-		for emotion in tqdm(self.emotionFolderNames, leave=False):
+		for emotion in tqdm(const.CLASSES, leave=False):
 
 			# Stats for this specific emotion
 			numOfCorrectlyClassified_specific = 0
@@ -152,7 +132,7 @@ class Baselines:
 
 		# Print stats
 		percentage = (numOfCorrectlyClassified_total / numOfImagesTested_total) * 100
-		print(f"Accuracy: {percentage}%")
+		print(f"Accuracy: {round(percentage,2)}%")
 
-		for index, emotion in enumerate(self.emotionFolderNames):
-			print(f"- {emotion.capitalize()}: {specific_percentages[index]}%")
+		for index, emotion in enumerate(const.CLASSES):
+			print(f"- {emotion.capitalize()}: {round(specific_percentages[index],2)}%")

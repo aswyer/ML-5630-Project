@@ -18,8 +18,6 @@ class NeuralNetwork:
 
 	def random(self, rows, columns):
 		return np.random.rand(rows, columns) * 2 - 1
-		# return np.zeros((rows, columns))
-		# return np.full((rows,columns), 0.1)
 
 	def sigmoid(self, x):
 		return 1 / (1 + np.exp(-x))
@@ -48,7 +46,7 @@ class NeuralNetwork:
 		reshaped = np.reshape(output_activated, (self.numOutputNodes,))
 		return reshaped
 
-	# Backpropigation
+	# Backpropagation
 	def train(self, lr, input, correctOutput):
 
 		# ---------------- Same code as seen in feedfoward() ------------------
@@ -108,5 +106,3 @@ class NeuralNetwork:
 		ho_flattened = self.weights_hidden_output.flat
 		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/const.NUM_WEIGHT_SAMPLES))]
 		return (ih_samples, ho_samples)
-
-		

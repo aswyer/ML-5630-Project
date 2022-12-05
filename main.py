@@ -21,12 +21,6 @@ def baselines():
 	main.train()
 	main.test()
 
-	# if want to test specific image set breakpoint on print("") & run the below code in the debug console:
-	# imageData = main.loadImage("positive", "positive_2.png")
-	# print(main.network.feedfoward(imageData))
-
-	print("")
-
 if __name__ == "__main__":
 	print(r"""
 
@@ -56,11 +50,13 @@ By: Andrew Sawyer, Fuller Henderson, Luke Robinson
 			print("Running Custom MLP:")
 			print("-------------------")
 			customMLP()
+			print("-------------------")
 		elif userInput == 2:
 			print("------------------")
 			print("Running Baselines:")
 			print("------------------")
 			baselines()
+			print("------------------")
 		elif userInput == 3:
 			print("")
 			constantsFilePath = os.getcwd() + '/constants.py';
