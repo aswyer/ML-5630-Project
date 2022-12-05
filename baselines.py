@@ -122,7 +122,7 @@ class Baselines:
 				# Load image & process it with the neural network
 				imageData = self.loadImage(emotion, fileName).transpose()
 				
-				output = self.network.predict(imageData)
+				output = self.network.predict_proba(imageData)
 				
 				# Compare to the correct output
 				predictedEmotion = self.emotionFromOutputArray(output)
