@@ -54,7 +54,14 @@ class Baselines:
 		print("🛠️  Setting Up")
 		
 		# create nn
-		self.network = MLPClassifier(max_iter=const.EPOCHS, activation='logistic', hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER, const.NUM_HIDDEN_LAYERS), learning_rate=('invscaling' if const.LR_INVERSE_SCALING_ON else 'constant'), learning_rate_init=const.MAX_LEARNING_RATE,random_state=1)
+		self.network = MLPClassifier(
+			max_iter=const.EPOCHS, 
+			hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER, const.NUM_HIDDEN_LAYERS), 
+			activation='logistic', 
+			learning_rate=('invscaling' if const.LR_INVERSE_SCALING_ON else 'constant'), 
+		 	learning_rate_init=const.MAX_LEARNING_RATE,
+			random_state=1
+		)
 
 		# Setup debug plot
 		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_SAMPLES), int)
@@ -81,14 +88,14 @@ class Baselines:
 		allImageAssets = self.getImageAssets()
 
 		# Train for each image
-		for imageAsset in tqdm(allImageAssets, leave=False):
+		for imageAsset in tqdm(allImageAssets):
 			(emotion, emotionIndex, fileName) = imageAsset
 			
 			imageInput = self.loadImage(emotion, fileName).transpose()
-			expectedOutput = const.CORRECT_OUTPUT[emotionIndex]
-			expectedOutput = self.emotionFromOutputArray(expectedOutput)
+			expectedOutput = [const.CORRECT_OUTPUT[emotionIndex]]
+			# expectedOutput = self.emotionFromOutputArray(expectedOutput)
 
-			self.network.partial_fit(imageInput, [expectedOutput], const.CLASSES)
+			self.network.partial_fit(imageInput, expectedOutput, const.CORRECT_OUTPUT)
 				
 
 	def test(self):
@@ -100,7 +107,7 @@ class Baselines:
 		specific_percentages = []
 
 		# Test each emotion
-		for emotion in tqdm(const.CLASSES, leave=False):
+		for emotion in tqdm(const.CLASSES):
 
 			# Stats for this specific emotion
 			numOfCorrectlyClassified_specific = 0
@@ -115,7 +122,7 @@ class Baselines:
 				# Load image & process it with the neural network
 				imageData = self.loadImage(emotion, fileName).transpose()
 				
-				output = self.network.predict_proba(imageData)
+				output = self.network.predict(imageData)
 				
 				# Compare to the correct output
 				predictedEmotion = self.emotionFromOutputArray(output)
