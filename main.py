@@ -9,10 +9,13 @@ def customMLP():
 	mlp.setup()
 	for epoch in range(const.EPOCHS):
 		mlp.train(epoch)
-	mlp.test()
+	
 	# if want to test specific image set breakpoint on mlp.showDebugPlot() & run the below code in the debug console:
 	# imageData = main.loadImage("positive", "positive_2.png")
 	# print(main.network.feedfoward(imageData))
+	mlp.test()
+	print("")
+	print("🔔 Close graph to continue")
 	mlp.showDebugPlot()
 
 def baselines():
@@ -25,12 +28,12 @@ if __name__ == "__main__":
 	print(r"""
 
 ==================================================	                                       
- ___ ___ ___ ___     _____ __    _____ 
-|  _|  _|_  |   |___|     |  |  |  _  |
-|_  | . |_  | | |___| | | |  |__|   __|
-|___|___|___|___|   |_|_|_|_____|__|   
+      ___ ___ ___ ___     _____ __    _____ 
+     |  _|  _|_  |   |___|     |  |  |  _  |
+     |_  | . |_  | | |___| | | |  |__|   __|
+     |___|___|___|___|   |_|_|_|_____|__|   
 
-By: Andrew Sawyer, Fuller Henderson, Luke Robinson
+by: Andrew Sawyer, Fuller Henderson, Luke Robinson
 ==================================================
 	""")
 
@@ -50,7 +53,7 @@ By: Andrew Sawyer, Fuller Henderson, Luke Robinson
 			print("Running Custom MLP:")
 			print("-------------------")
 			customMLP()
-			print("-------------------")
+			print("--------------------------")
 		elif userInput == 2:
 			print("------------------")
 			print("Running Baselines:")

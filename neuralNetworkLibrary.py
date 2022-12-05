@@ -161,7 +161,7 @@ class NeuralNetworkLibrary:
 		for index, emotion in enumerate(const.CLASSES):
 			print(f"- {emotion.capitalize()}: {round(specific_percentages[index],2)}%")
 
-		print(f"\nMSE: {round(mse.mean(),2)} (avg)")
+		print(f"MSE: {round(mse.mean(),2)} (avg)")
 		for index, emotion in enumerate(const.CLASSES):
 			print(f"- {emotion.capitalize()}: {round(mse[index],2)}")
 
