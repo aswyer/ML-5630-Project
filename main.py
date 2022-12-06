@@ -12,7 +12,7 @@ def customMLP():
 	mlp.setup()
 
 	for epoch in range(const.EPOCHS):
-		print(f"🎛️  Training #{epoch+1}")
+		print(f"🎛️  Training #{epoch+1}/{const.EPOCHS}")
 		mlp.train()
 	
 	print("📊 Testing")
