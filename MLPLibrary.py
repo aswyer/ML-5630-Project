@@ -26,10 +26,8 @@ class MLPLibrary:
 		for i, imageAsset in enumerate(tqdm(allImageAssets)):
 			(className, classIndex, fileName) = imageAsset
 			
-			expectedOutput = const.CORRECT_OUTPUT[classIndex]
-			expectedOutput = np.reshape(expectedOutput, (len(expectedOutput), 1))
-			
 			imageInput = helper.loadImage(className, fileName)
+			expectedOutput = const.CORRECT_OUTPUT[classIndex]
 			
 			# adjust learning rate if LR_INVERSE_SCALING_ON is true
 			learningRate = const.MAX_LEARNING_RATE

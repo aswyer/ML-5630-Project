@@ -1,5 +1,3 @@
-import numpy as np
-
 # DATASET
 DATASET_FOLDER_NAME = "dataset_emotion" # dataset_emotion 	| 	dataset_numbers
 INPUT_IMAGE_LENGTH = 48					# 48				| 	28
@@ -11,19 +9,19 @@ CLASSES = ["anger", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
 # CLASSES = ["1", "2", "3", "4", "5", "6", "7"]
 
 # library only supports data in this format currently
-CORRECT_OUTPUT = np.array([
-	# [1,0,0,0,0,0,0], # anger, 1
-	# [0,1,0,0,0,0,0], # disgust, 2
-	# [0,0,1,0,0,0,0], # fear, 3
-	# [0,0,0,1,0,0,0], # happy, 4
-	# [0,0,0,0,1,0,0], # neutral, 5
-	# [0,0,0,0,0,1,0], # sad, 6
-	# [0,0,0,0,0,0,1], # surprise, 7
+CORRECT_OUTPUT = [
+	[1,0,0,0,0,0,0], # anger, 1
+	[0,1,0,0,0,0,0], # disgust, 2
+	[0,0,1,0,0,0,0], # fear, 3
+	[0,0,0,1,0,0,0], # happy, 4
+	[0,0,0,0,1,0,0], # neutral, 5
+	[0,0,0,0,0,1,0], # sad, 6
+	[0,0,0,0,0,0,1], # surprise, 7
 
 	# TODO: move for baselines only
 	# '1','2','3','4','5','6','7'
-	"anger", "disgust", "fear", "happy", "neutral", "sad", "surprise"
-])
+	# "anger", "disgust", "fear", "happy", "neutral", "sad", "surprise"
+]
 
 # CONFIG
 EPOCHS = 20

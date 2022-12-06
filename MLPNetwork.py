@@ -20,16 +20,15 @@ class MLPNetwork:
 		return np.random.rand(rows, columns) * 2 - 1
 
 	def activationFunc(self, x):
-		return max(0, x) #relu
+		return np.maximum(0, x) #relu
 		# return 1 / (1 + np.exp(-x)) # sigmoid
 	
 	# assume x has been run through sigmoid already
 	def derivative_activationFunc(self, x):
 		# relu
-		if x <= 0:
-			return 0
-		else:
-			return 1
+		x[x<=0] = 0
+		x[x>0] = 1
+		return x
 
 		# sigmoid
 		# return x * (1 - x)
@@ -56,6 +55,10 @@ class MLPNetwork:
 
 	# Backpropagation
 	def train(self, lr, input, correctOutput):
+
+		# format inputs
+		input = np.reshape(input, (len(input), 1))
+		correctOutput = np.reshape(correctOutput, (len(correctOutput), 1))
 
 		# ---------------- Same code as seen in feedfoward() ------------------
 		# Outputs of "Hidden" Layer
