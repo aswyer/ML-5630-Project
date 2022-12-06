@@ -9,7 +9,7 @@ class MLPLibrary:
 	def setup(self):
 		
 		# Create network
-		sizeOfInputLayer = pow(const.INPUT_IMAGE_SIZE, 2) # based on image size
+		sizeOfInputLayer = pow(const.INPUT_IMAGE_LENGTH, 2) # based on image size
 		sizeOfOutputLayer = len(const.CORRECT_OUTPUT[0])
 		self.network = MLPNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
@@ -23,7 +23,7 @@ class MLPLibrary:
 		allImageAssets = helper.getImageAssets(helper.ImageUse.TRAINING)
 
 		# Train for each image
-		for i, imageAsset in enumerate(tqdm(allImageAssets, leave=False)):
+		for i, imageAsset in enumerate(tqdm(allImageAssets)):
 			(className, classIndex, fileName) = imageAsset
 			
 			expectedOutput = const.CORRECT_OUTPUT[classIndex]

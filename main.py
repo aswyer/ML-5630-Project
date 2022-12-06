@@ -31,15 +31,16 @@ def mlpClassifierBaseline():
 	print("🛠️  Setting Up")
 	mlp.setup()
 
-	print(f"🎛️  Training")
+	print(f"🖼️  Importing Images")
+	mlp.loadImages()
+
+	print(f"🎛️  Training...")
 	mlp.train()
 
 	print("📊 Testing")
 	mlp.test()
 
 	print("")
-	print("🔔 Close graph to continue")
-	helper.showDebugPlot(mlp.ihWeightSamples, mlp.hoWeightSamples)
 
 if __name__ == "__main__":
 	print(r"""

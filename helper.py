@@ -11,8 +11,8 @@ class ImageUse(Enum):
 	TESTING = 2
 
 def classFromOutput(output):
-		highestValueIndex = np.argmax(output)
-		return const.CLASSES[highestValueIndex]
+	highestValueIndex = np.argmax(output)
+	return const.CLASSES[highestValueIndex]
 	
 def fileNames(className, mode: ImageUse):
 	# get file names from os
@@ -22,6 +22,10 @@ def fileNames(className, mode: ImageUse):
 		if name.endswith('.jpg') is False: continue # TODO: update to work with any image data type
 		fileNames.append(name)
 	
+	# reduce dataset by multiple
+	end = int(len(fileNames) * const.DATASET_DEBUG_SIZE_MULTIPLE)
+	fileNames = fileNames[0:end]
+	
 	# randomize order of files
 	random.shuffle(fileNames)
 
@@ -30,21 +34,20 @@ def fileNames(className, mode: ImageUse):
 	trainingCount = round(totalCount * const.TRAINING_TEST_RATIO)
 
 	if mode is ImageUse.TRAINING:
-		return fileNames[:trainingCount]
+		return fileNames[0:trainingCount]
 	else:
-		testingCount = totalCount - trainingCount
-		return fileNames[testingCount:]
+		return fileNames[trainingCount:totalCount]
 
 def loadImage(className, fileName):
 		path = const.DATASET_FOLDER_NAME + '/' + className + '/' + fileName
 		
-		image = Image.open(path)
-		image = ImageOps.grayscale(image)
-		array = np.array(image).flatten()
-		array = np.reshape(array, (len(array), 1))
-		normalized = (array / 255) * 2 - 1
 		
-		return normalized
+		image = Image.open(path)
+		# image = ImageOps.grayscale(image)
+		array = np.reshape(image, (const.INPUT_IMAGE_FLAT_LENGTH,))
+		normalized = (array / 255.0) #TODO: should / 2 - 1?
+				
+		return normalized.tolist()
 
 def showDebugPlot(ihWeightSamples, hoWeightSamples):
 	# Configure & show debug plot
