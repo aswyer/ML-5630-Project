@@ -2,13 +2,13 @@
 DATASET_FOLDER_NAME = "dataset_emotion" # dataset_emotion 	| 	dataset_numbers
 INPUT_IMAGE_LENGTH = 48					# 48				| 	28
 
-DATASET_DEBUG_SIZE_MULTIPLE = 5/5 # Only use portion of entire data set for debuging. Use 1 for entire dataset.
+DATASET_DEBUG_SIZE_MULTIPLE = 3/5 # Only use portion of entire data set for debuging. Use 1 for entire dataset.
 TRAINING_TEST_RATIO = 0.8		# Percent of data to use for training. (1 - TRAINING_TEST_RATIO) will be used for testing.
 
 CLASSES = ["anger", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
 # CLASSES = ["1", "2", "3", "4", "5", "6", "7"]
 
-# library only supports data in this format currently
+# Only for Custom MLP. Library only supports data in this format currently
 CORRECT_OUTPUT = [
 	[1,0,0,0,0,0,0], # anger, 1
 	[0,1,0,0,0,0,0], # disgust, 2
@@ -17,15 +17,11 @@ CORRECT_OUTPUT = [
 	[0,0,0,0,1,0,0], # neutral, 5
 	[0,0,0,0,0,1,0], # sad, 6
 	[0,0,0,0,0,0,1], # surprise, 7
-
-	# TODO: move for baselines only
-	# '1','2','3','4','5','6','7'
-	# "anger", "disgust", "fear", "happy", "neutral", "sad", "surprise"
 ]
 
 # CONFIG
-EPOCHS = 20
-MAX_LEARNING_RATE = 0.01 		# Will be used as constant learning rate if LR_INVERSE_SCALING_ON is false
+EPOCHS = 1						# Higher epochs -> better the accuracy
+MAX_LEARNING_RATE = 0.03 		# Will be used as constant learning rate if LR_INVERSE_SCALING_ON is false
 LR_INVERSE_SCALING_ON = False 	# Currently doesn't support multiple epochs for custom MLP. Will cycle scaling for each epoch.
 
 # HIDDEN LAYER
@@ -35,6 +31,14 @@ NUM_HIDDEN_LAYERS = 1			# Only for baselines MLPClassifier. Weight graph will on
 # PLOTTING
 SHOULD_PLOT_WEIGHTS = True
 NUM_WEIGHT_PLOT_SAMPLES = 24 	# Number of weight samples to show in the graph. Only for custom MLP.
+
+
+
+
+
+
+
+
 
 
 

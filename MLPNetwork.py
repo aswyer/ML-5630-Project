@@ -20,18 +20,18 @@ class MLPNetwork:
 		return np.random.rand(rows, columns) * 2 - 1
 
 	def activationFunc(self, x):
-		return np.maximum(0, x) #relu
-		# return 1 / (1 + np.exp(-x)) # sigmoid
+		# return np.maximum(0, x) #relu
+		return 1 / (1 + np.exp(-x)) # sigmoid
 	
 	# assume x has been run through sigmoid already
 	def derivative_activationFunc(self, x):
 		# relu
-		x[x<=0] = 0
-		x[x>0] = 1
-		return x
+		# x[x<=0] = 0
+		# x[x>0] = 1
+		# return x
 
 		# sigmoid
-		# return x * (1 - x)
+		return x * (1 - x)
 
 	def feedfoward(self, input):
 

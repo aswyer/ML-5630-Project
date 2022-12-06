@@ -14,8 +14,9 @@ class MLPLibrary:
 		self.network = MLPNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 		# Setup debug plot
-		self.ihWeightSamples = []
-		self.hoWeightSamples = []
+		if const.SHOULD_PLOT_WEIGHTS:
+			self.ihWeightSamples = []
+			self.hoWeightSamples = []
 
 	def train(self):
 

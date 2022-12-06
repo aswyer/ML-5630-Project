@@ -45,7 +45,7 @@ def loadImage(className, fileName):
 		image = Image.open(path)
 		# image = ImageOps.grayscale(image)
 		array = np.reshape(image, (const.INPUT_IMAGE_FLAT_LENGTH,))
-		normalized = (array / 255.0) #TODO: should / 2 - 1?
+		normalized = (array / 255.0) # * 2 - 1
 				
 		return normalized.tolist()
 

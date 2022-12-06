@@ -14,7 +14,7 @@ class MLPClassifierBaseline:
 		self.network = MLPClassifier(
 			hidden_layer_sizes=(const.SIZE_HIDDEN_LAYER,), 
 			max_iter=const.EPOCHS,
-			activation='relu',
+			activation='logistic', #'relu',
 			solver="sgd",
 			learning_rate=('invscaling' if const.LR_INVERSE_SCALING_ON else 'constant'), 
 			learning_rate_init=const.MAX_LEARNING_RATE,
@@ -25,7 +25,6 @@ class MLPClassifierBaseline:
 		# Get all images
 		allImageAssets = helper.getImageAssets(helper.ImageUse.TRAINING)
 
-		imgLength = pow(const.INPUT_IMAGE_LENGTH, 2)
 		self.X = []
 		self.y = []
 
@@ -34,10 +33,9 @@ class MLPClassifierBaseline:
 			(className, classIndex, fileName) = imageAsset
 
 			Xi = helper.loadImage(className, fileName)
-			yi = const.CORRECT_OUTPUT[classIndex]
 
 			self.X.append(Xi)
-			self.y.append(yi)
+			self.y.append(className)
 
 	def train(self):
 		with warnings.catch_warnings():
