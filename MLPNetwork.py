@@ -35,6 +35,9 @@ class MLPNetwork:
 
 	def feedfoward(self, input):
 
+		# format inputs
+		input = np.reshape(input, (len(input), 1))
+
 		# Outputs of "Hidden" Layer
 		# multiply inputs & input->hidden weights
 		hidden = np.matmul(self.weights_input_hidden, input)
@@ -111,9 +114,11 @@ class MLPNetwork:
 		# update bias
 		self.bias_hidden = np.add(self.bias_hidden, hidden_gradients)
 
-		# return debug values to plot
-		ih_flattened = self.weights_input_hidden.flat
-		ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/const.NUM_WEIGHT_PLOT_SAMPLES))]
-		ho_flattened = self.weights_hidden_output.flat
-		ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/const.NUM_WEIGHT_PLOT_SAMPLES))]
-		return (ih_samples, ho_samples)
+
+		if const.SHOULD_PLOT_WEIGHTS:
+			# return debug values to plot
+			ih_flattened = self.weights_input_hidden.flat
+			ih_samples = ih_flattened[::int(np.ceil(len(ih_flattened)/const.NUM_WEIGHT_PLOT_SAMPLES))]
+			ho_flattened = self.weights_hidden_output.flat
+			ho_samples = ho_flattened[::int(np.ceil(len(ho_flattened)/const.NUM_WEIGHT_PLOT_SAMPLES))]
+			return (ih_samples, ho_samples)

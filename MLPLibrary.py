@@ -1,7 +1,7 @@
-from tqdm import tqdm
-import constants as const
-import numpy as np
 from MLPNetwork import MLPNetwork
+import constants as const
+from tqdm import tqdm
+import numpy as np
 import helper
 
 class MLPLibrary:
@@ -14,8 +14,8 @@ class MLPLibrary:
 		self.network = MLPNetwork(sizeOfInputLayer, const.SIZE_HIDDEN_LAYER, sizeOfOutputLayer)
 
 		# Setup debug plot
-		self.ihWeightSamples = np.empty((0,const.NUM_WEIGHT_PLOT_SAMPLES), int)
-		self.hoWeightSamples = np.empty((0,const.NUM_WEIGHT_PLOT_SAMPLES), int)
+		self.ihWeightSamples = []
+		self.hoWeightSamples = []
 
 	def train(self):
 
@@ -25,8 +25,9 @@ class MLPLibrary:
 		# Train for each image
 		for i, imageAsset in enumerate(tqdm(allImageAssets)):
 			(className, classIndex, fileName) = imageAsset
-			
+
 			imageInput = helper.loadImage(className, fileName)
+
 			expectedOutput = const.CORRECT_OUTPUT[classIndex]
 			
 			# adjust learning rate if LR_INVERSE_SCALING_ON is true
@@ -35,10 +36,12 @@ class MLPLibrary:
 				percentageIncomplete = 1 - (i / len(allImageAssets))
 				learningRate *= pow(percentageIncomplete, 2)
 
-			(ihWeightSample, hoWeightSample) = self.network.train(learningRate, imageInput, expectedOutput)
-
-			self.ihWeightSamples = np.append(self.ihWeightSamples, [ihWeightSample], axis=0)
-			self.hoWeightSamples = np.append(self.hoWeightSamples, [hoWeightSample], axis=0)
+			if const.SHOULD_PLOT_WEIGHTS:
+				(ihWeightSample, hoWeightSample) = self.network.train(learningRate, imageInput, expectedOutput)
+				self.ihWeightSamples.append(ihWeightSample)
+				self.hoWeightSamples.append(hoWeightSample)
+			else:
+				self.network.train(learningRate, imageInput, expectedOutput)
 
 	def test(self):
 

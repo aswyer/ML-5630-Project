@@ -21,9 +21,10 @@ def customMLP():
 	# imageData = main.loadImage("positive", "positive_2.png")
 	# print(main.network.feedfoward(imageData))
 
-	print("")
-	print("🔔 Close graph to continue")
-	helper.showDebugPlot(mlp.ihWeightSamples, mlp.hoWeightSamples)
+	if const.SHOULD_PLOT_WEIGHTS:
+		print("")
+		print("🔔 Close graph to continue")
+		helper.showDebugPlot(mlp.ihWeightSamples, mlp.hoWeightSamples)
 
 def mlpClassifierBaseline():
 	mlp = MLPClassifierBaseline()
