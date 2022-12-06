@@ -33,7 +33,7 @@ class MLPNetwork:
 		# sigmoid
 		return x * (1 - x)
 
-	def feedfoward(self, input):
+	def feedforward(self, input):
 
 		# format inputs
 		input = np.reshape(input, (len(input), 1))
@@ -63,7 +63,7 @@ class MLPNetwork:
 		input = np.reshape(input, (len(input), 1))
 		correctOutput = np.reshape(correctOutput, (len(correctOutput), 1))
 
-		# ---------------- Same code as seen in feedfoward() ------------------
+		# ---------------- Same code as seen in feedforward() ------------------
 		# Outputs of "Hidden" Layer
 		# multiply inputs & input->hidden weights
 		hidden = np.matmul(self.weights_input_hidden, input)

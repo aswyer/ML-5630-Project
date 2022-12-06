@@ -62,7 +62,7 @@ class MLPLibrary:
 			imageData = helper.loadImage(className, fileName)
 
 			# Feedfoward
-			output = self.network.feedfoward(imageData)
+			output = self.network.feedforward(imageData)
 
 			# Update total
 			totalPerClass[classIndex] += 1
