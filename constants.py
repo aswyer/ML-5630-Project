@@ -20,13 +20,13 @@ CORRECT_OUTPUT = [
 ]
 
 # CONFIG
-EPOCHS = 1						# Higher epochs -> better the accuracy
-MAX_LEARNING_RATE = 0.03 		# Will be used as constant learning rate if LR_INVERSE_SCALING_ON is false
+EPOCHS = 10						# Higher epochs -> better the accuracy
+MAX_LEARNING_RATE = 0.1 		# Will be used as constant learning rate if LR_INVERSE_SCALING_ON is false
 LR_INVERSE_SCALING_ON = False 	# Currently doesn't support multiple epochs for custom MLP. Will cycle scaling for each epoch.
 
 # HIDDEN LAYER
 SIZE_HIDDEN_LAYER = 300
-NUM_HIDDEN_LAYERS = 1			# Only for baselines MLPClassifier. Weight graph will only display first two layers of weights.
+NUM_HIDDEN_LAYERS = 1			# Not currently implemented.
 
 # PLOTTING
 SHOULD_PLOT_WEIGHTS = True

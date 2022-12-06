@@ -77,7 +77,6 @@ class MLPLibrary:
 			squared = np.square(error)
 			squaredError = np.add(squaredError, squared)
 
-
 		numCorrect = np.sum(correctlyClassified)
 		numTotal = np.sum(totalPerClass)
 
