@@ -44,10 +44,10 @@ class MLPLibrary:
 			else:
 				self.network.train(learningRate, imageInput, expectedOutput)
 
-	def test(self):
+	def test(self, mode = helper.ImageUse.TESTING):
 
 		# Test each class
-		testImageAssets = helper.getImageAssets(helper.ImageUse.TESTING)
+		testImageAssets = helper.getImageAssets(mode)
 
 		# Stat variables
 		numOfClasses = len(const.CLASSES)
@@ -55,7 +55,8 @@ class MLPLibrary:
 		correctlyClassified = np.zeros((numOfClasses,))
 		totalPerClass = np.zeros((numOfClasses,))
 
-		for imageAsset in tqdm(testImageAssets):
+		shouldLeaveProgressBar = mode != helper.ImageUse.TESTING_SAMPLE
+		for imageAsset in tqdm(testImageAssets, leave=shouldLeaveProgressBar):
 			(className, classIndex, fileName) = imageAsset
 
 			imageData = helper.loadImage(className, fileName)
@@ -85,12 +86,17 @@ class MLPLibrary:
 
 		# Print stats
 		binaryAccuracy = (numCorrect/numTotal) * 100
-		binaryAccuracyPerClass = np.divide(correctlyClassified, totalPerClass) * 100
 
-		print(f"Binary Accuracy: {round(binaryAccuracy,2)}% (avg)")
-		for index, className in enumerate(const.CLASSES):
-			print(f"- {className.capitalize()}: {round(binaryAccuracyPerClass[index],2)}%")
+		if mode == helper.ImageUse.TESTING_SAMPLE:
+			sampleAccuracy = round(binaryAccuracy,2)
+			print(f'-> Sample Accuracy: {sampleAccuracy}%')
 
-		print(f"MSE: {round(mse.mean(),2)} (avg)")
-		for index, className in enumerate(const.CLASSES):
-			print(f"- {className.capitalize()}: {round(mse[index],2)}")
+		else:
+			binaryAccuracyPerClass = np.divide(correctlyClassified, totalPerClass) * 100
+			print(f"Binary Accuracy: {round(binaryAccuracy,2)}% (avg)")
+			for index, className in enumerate(const.CLASSES):
+				print(f"- {className.capitalize()}: {round(binaryAccuracyPerClass[index],2)}%")
+
+			print(f"MSE: {round(mse.mean(),2)} (avg)")
+			for index, className in enumerate(const.CLASSES):
+				print(f"- {className.capitalize()}: {round(mse[index],2)}")

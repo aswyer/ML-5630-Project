@@ -9,6 +9,7 @@ import os
 class ImageUse(Enum):
 	TRAINING = 1
 	TESTING = 2
+	TESTING_SAMPLE = 3
 
 def classFromOutput(output):
 	highestValueIndex = np.argmax(output)
@@ -23,8 +24,10 @@ def fileNames(className, mode: ImageUse):
 		fileNames.append(name)
 	
 	# reduce dataset by multiple
-	end = int(len(fileNames) * const.DATASET_DEBUG_SIZE_MULTIPLE)
-	fileNames = fileNames[0:end]
+	end = len(fileNames) * const.DATASET_DEBUG_SIZE_MULTIPLE
+	if mode == ImageUse.TESTING_SAMPLE:
+		end *= 0.2
+	fileNames = fileNames[0:int(end)]
 	
 	# randomize order of files
 	random.shuffle(fileNames)

@@ -14,6 +14,8 @@ def customMLP():
 	for epoch in range(const.EPOCHS):
 		print(f"🎛️  Training #{epoch+1}/{const.EPOCHS}")
 		mlp.train()
+		if const.EPOCHS != 1:
+			mlp.test(mode=helper.ImageUse.TESTING_SAMPLE)
 	
 	print("📊 Testing")
 	mlp.test()
