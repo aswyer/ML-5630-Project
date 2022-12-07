@@ -44,7 +44,6 @@ def fileNames(className, mode: ImageUse):
 def loadImage(className, fileName):
 		path = const.DATASET_FOLDER_NAME + '/' + className + '/' + fileName
 		
-		
 		image = Image.open(path)
 		# image = ImageOps.grayscale(image)
 		array = np.reshape(image, (const.INPUT_IMAGE_FLAT_LENGTH,))
