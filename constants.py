@@ -2,7 +2,7 @@
 DATASET_FOLDER_NAME = "dataset_emotion" # dataset_emotion 	| 	dataset_numbers
 INPUT_IMAGE_LENGTH = 48					# 48				| 	28
 
-DATASET_DEBUG_SIZE_MULTIPLE = 1/5 # Only use portion of entire data set for debuging. Use 1 for entire dataset.
+DATASET_DEBUG_SIZE_MULTIPLE = 2/5 # Only use portion of entire data set for debuging. Use 1 for entire dataset.
 TRAINING_TEST_RATIO = 0.8		# Percent of data to use for training. (1 - TRAINING_TEST_RATIO) will be used for testing.
 
 CLASSES = ["anger", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
@@ -21,12 +21,11 @@ CORRECT_OUTPUT = [
 
 # CONFIG
 EPOCHS = 1						# Higher epochs -> better the accuracy
-MAX_LEARNING_RATE = 0.1 		# Will be used as constant learning rate if LR_INVERSE_SCALING_ON is false
+MAX_LEARNING_RATE = 0.01 		# Will be used as constant learning rate if LR_INVERSE_SCALING_ON is false
 LR_INVERSE_SCALING_ON = False 	# Currently doesn't support multiple epochs for custom MLP. Will cycle scaling for each epoch.
 
 # HIDDEN LAYER
 SIZE_HIDDEN_LAYER = 300
-NUM_HIDDEN_LAYERS = 1			# Not currently implemented.
 
 # PLOTTING
 SHOULD_PLOT_WEIGHTS = True
